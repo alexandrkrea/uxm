@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Hero Banner - 1920px Constrained Layout</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,11 +19,9 @@
             --font-unbounded: 'Unbounded', sans-serif;
             --font-mulish: 'Mulish', sans-serif;
             
-            /* Переменные для динамической маски фона и фокуса */
+            /* Динамические координаты фонарика */
             --mouse-x: 50%;
             --mouse-y: 50%;
-            --mask-size: 0px; 
-            --mask-blur: 0px;
         }
 
         * {
@@ -35,9 +33,10 @@
         html, body {
             background-color: var(--bg-main);
             height: 100vh;
+            height: 100lvh; 
             width: 100%;
             position: relative;
-            overflow: hidden; /* Нам больше не нужен скролл, всё помещается в один экран */
+            overflow: hidden; 
             font-family: var(--font-unbounded);
         }
 
@@ -49,8 +48,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 120vw; 
-            height: 120vh;
+            width: 130vw; 
+            height: 130vh;
             transform: translate(-50%, -50%);
             background-image: url('bg.svg');
             background-position: center;
@@ -88,6 +87,7 @@
             transform: translateX(-40%); 
             width: 70vh; 
             height: 100vh;           
+            height: 100lvh;
             z-index: 3;             
             pointer-events: none; 
             will-change: transform;
@@ -103,35 +103,23 @@
             display: block;
         }
 
-        /* Маска для ОРИГИНАЛЬНОГО изображения */
+        /* ИСПРАВЛЕНИЕ: Центральная область (ядро) увеличена в 2 раза (с 80px до 160px).
+           Общий радиус маски увеличен до 360px для сохранения красивого мягкого блёра по краям. 
+        */
         .character-img.base-layer {
-            -webkit-mask-image: radial-gradient(
-                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
-                transparent calc(var(--mask-size) - var(--mask-blur)), 
-                black var(--mask-size)
-            );
-            mask-image: radial-gradient(
-                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
-                transparent calc(var(--mask-size) - var(--mask-blur)), 
-                black var(--mask-size)
-            );
+            position: relative;
+            z-index: 1;
+            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 360px);
+            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 360px);
         }
 
-        /* Маска для ЭФФЕКТА */
         .character-img.hover-layer {
             position: absolute;
             top: 0;
             left: 0;
-            -webkit-mask-image: radial-gradient(
-                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
-                black calc(var(--mask-size) - var(--mask-blur)), 
-                transparent var(--mask-size)
-            );
-            mask-image: radial-gradient(
-                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
-                black calc(var(--mask-size) - var(--mask-blur)), 
-                transparent var(--mask-size)
-            );
+            z-index: 2;
+            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 360px);
+            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 360px);
         }
 
         .page-wrapper {
@@ -139,6 +127,7 @@
             width: 100%;
             max-width: 1920px;
             height: 100vh;
+            height: 100lvh;
             margin: 0 auto; 
             padding: 64px 80px; 
             display: flex;
@@ -195,13 +184,8 @@
             background-color: #f2ff44;
         }
 
-        .btn-cta svg {
-            transition: transform 0.3s ease;
-        }
-
-        .btn-cta:hover svg {
-            transform: translate(2px, -2px);
-        }
+        .btn-cta svg { transition: transform 0.3s ease; }
+        .btn-cta:hover svg { transform: translate(2px, -2px); }
 
         .burger-btn {
             background: rgba(22, 27, 36, 0.15);
@@ -217,15 +201,8 @@
             transition: all 0.3s ease;
         }
 
-        .burger-btn:hover {
-            background: rgba(22, 27, 36, 0.3);
-        }
-
-        .burger-btn.hidden-state {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.8);
-        }
+        .burger-btn:hover { background: rgba(22, 27, 36, 0.3); }
+        .burger-btn.hidden-state { opacity: 0; pointer-events: none; transform: scale(0.8); }
 
         .mentor-card {
             position: absolute;
@@ -302,9 +279,7 @@
             pointer-events: auto;
         }
 
-        .main-content .btn-cta {
-            display: none; /* Скрыта на десктопе, так как кнопка в хедере */
-        }
+        .main-content .btn-cta { display: none; }
 
         .label-container {
             display: flex;
@@ -397,22 +372,10 @@
             box-shadow: 0 0 15px rgba(225, 240, 48, 0.5);
         }
 
-        .play-circle svg {
-            transition: all 0.3s ease;
-        }
-
-        .video-link:hover .play-circle svg {
-            fill: var(--text-dark);
-            transform: scale(1.1);
-        }
-
-        .video-link span {
-            transition: color 0.3s ease;
-        }
-        
-        .video-link:hover span {
-            color: var(--accent-lime);
-        }
+        .play-circle svg { transition: all 0.3s ease; }
+        .video-link:hover .play-circle svg { fill: var(--text-dark); transform: scale(1.1); }
+        .video-link span { transition: color 0.3s ease; }
+        .video-link:hover span { color: var(--accent-lime); }
 
         .footer-text {
             font-family: var(--font-mulish); 
@@ -425,10 +388,6 @@
             pointer-events: auto;
         }
 
-        /* ==========================================================================
-           МОДАЛЬНОЕ ОКНО И МЕНЮ
-           ========================================================================== */
-        
         .overlay-modal, .fullscreen-menu {
             position: fixed;
             top: 0;
@@ -439,15 +398,14 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             z-index: 1000;
+            display: none; 
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .overlay-modal.active, .fullscreen-menu.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .overlay-modal.active { display: flex; opacity: 1; pointer-events: auto; }
+        .fullscreen-menu.active { display: block; opacity: 1; pointer-events: auto; }
 
         .menu-close-btn {
             position: absolute;
@@ -466,11 +424,7 @@
             transition: all 0.3s ease;
         }
 
-        .menu-close-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.6);
-            transform: scale(1.05);
-        }
+        .menu-close-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.6); transform: scale(1.05); }
 
         .modal-sheet {
             position: absolute;
@@ -486,296 +440,88 @@
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .overlay-modal.active .modal-sheet {
-            transform: translate(-50%, -50%) scale(1);
-        }
-
-        .modal-close-btn {
-            position: absolute;
-            top: 24px;
-            right: 24px;
-            background: rgba(255,255,255,0.05);
-            border: none;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            color: #ffffff;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background 0.2s;
-        }
-
-        .modal-close-btn:hover {
-            background: rgba(255,255,255,0.15);
-        }
-
-        .modal-title {
-            font-size: 28px;
-            font-weight: 500;
-            color: #ffffff;
-            text-transform: uppercase;
-            margin-bottom: 12px;
-            letter-spacing: -0.5px;
-        }
-
-        .modal-subtitle {
-            font-family: var(--font-mulish);
-            font-size: 16px;
-            color: var(--text-gray);
-            margin-bottom: 32px;
-            line-height: 1.4;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            font-family: var(--font-mulish);
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--accent-lime);
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            letter-spacing: 1px;
-        }
-
+        .overlay-modal.active .modal-sheet { transform: translate(-50%, -50%) scale(1); }
+        .modal-close-btn { position: absolute; top: 24px; right: 24px; background: rgba(255,255,255,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; color: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
+        .modal-close-btn:hover { background: rgba(255,255,255,0.15); }
+        .modal-title { font-size: 28px; font-weight: 500; color: #ffffff; text-transform: uppercase; margin-bottom: 12px; letter-spacing: -0.5px; }
+        .modal-subtitle { font-family: var(--font-mulish); font-size: 16px; color: var(--text-gray); margin-bottom: 32px; line-height: 1.4; }
+        .form-group { margin-bottom: 20px; }
+        .form-label { display: block; font-family: var(--font-mulish); font-size: 12px; font-weight: 600; color: var(--accent-lime); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        
         .form-input {
-            width: 100%;
-            height: 54px;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 8px;
-            padding: 0 18px;
-            font-family: var(--font-mulish);
-            color: #ffffff;
-            font-size: 16px;
-            transition: border-color 0.3s, background-color 0.3s;
+            width: 100%; height: 54px; background-color: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px; padding: 0 18px; font-family: var(--font-mulish); color: #ffffff; font-size: 16px; transition: border-color 0.3s, background-color 0.3s;
         }
+        .form-input:focus { outline: none; border-color: var(--accent-lime); background-color: rgba(255, 255, 255, 0.08); }
+        .modal-sheet .btn-submit { width: 100%; margin-top: 12px; }
 
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent-lime);
-            background-color: rgba(255, 255, 255, 0.08);
-        }
-
-        .modal-sheet .btn-submit {
-            width: 100%;
-            margin-top: 12px;
-        }
-
-        .menu-content-wrapper {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 80px;
-            max-width: 1920px;
-            margin: 0 auto;
-        }
-
-        .menu-nav {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-            width: fit-content; 
-        }
-
+        .menu-content-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 80px; max-width: 1920px; margin: 0 auto; }
+        .menu-nav { display: flex; flex-direction: column; gap: 24px; width: fit-content; }
+        
         .menu-link {
-            font-size: 48px;
-            font-weight: 400;
-            color: #ffffff;
-            text-decoration: none;
-            text-transform: uppercase;
-            letter-spacing: -1px;
-            width: fit-content;
+            font-size: 48px; font-weight: 400; color: #ffffff; text-decoration: none; text-transform: uppercase; letter-spacing: -1px; width: fit-content;
             transition: color 0.25s ease, transform 0.25s ease;
         }
 
-        .fullscreen-menu .menu-link {
-            transform: translateY(20px);
-            opacity: 0;
-            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-        }
-
-        .fullscreen-menu.active .menu-link {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
+        .fullscreen-menu .menu-link { transform: translateY(20px); opacity: 0; transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1); }
+        .fullscreen-menu.active .menu-link { transform: translateY(0); opacity: 1; }
         .fullscreen-menu.active .menu-link:nth-child(1) { transition-delay: 0.05s; }
         .fullscreen-menu.active .menu-link:nth-child(2) { transition-delay: 0.10s; }
         .fullscreen-menu.active .menu-link:nth-child(3) { transition-delay: 0.15s; }
         .fullscreen-menu.active .menu-link:nth-child(4) { transition-delay: 0.20s; }
+        .menu-link:hover { color: var(--accent-lime) !important; transform: translateX(12px) !important; transition-delay: 0s !important; }
 
-        .menu-link:hover {
-            color: var(--accent-lime) !important;
-            transform: translateX(12px) !important;
-            transition-delay: 0s !important; 
-        }
-
-        .menu-footer {
-            margin-top: 64px;
-            display: flex;
-            gap: 32px;
-            transform: translateY(20px);
-            opacity: 0;
-            transition: transform 0.4s ease 0.25s, opacity 0.4s ease 0.25s;
-            width: fit-content;
-        }
-
-        .fullscreen-menu.active .menu-footer {
-            transform: translateY(0);
-            opacity: 1;
-        }
-
-        .menu-social-link {
-            font-family: var(--font-mulish);
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-gray);
-            text-decoration: none;
-            transition: color 0.2s;
-        }
-
-        .menu-social-link:hover {
-            color: var(--accent-lime);
-        }
+        .menu-footer { margin-top: 64px; display: flex; gap: 32px; transform: translateY(20px); opacity: 0; transition: transform 0.4s ease 0.25s, opacity 0.4s ease 0.25s; width: fit-content; }
+        .fullscreen-menu.active .menu-footer { transform: translateY(0); opacity: 1; }
+        .menu-social-link { font-family: var(--font-mulish); font-size: 16px; font-weight: 600; color: var(--text-gray); text-decoration: none; transition: color 0.2s; }
+        .menu-social-link:hover { color: var(--accent-lime); }
 
         /* ==========================================================================
-           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ПОЛНОЭКРАННЫЙ ЖЕСТКИЙ МОНОЛИТ)
+           МОБИЛЬНАЯ АДАПТИВНОСТЬ
            ========================================================================== */
-        @media (max-width: 1400px) {
-            .bg-watermark { font-size: 320px; letter-spacing: -15px; }
-            .main-heading { font-size: 54px; }
-            .page-wrapper { padding: 40px 40px; }
-            .mentor-card { right: 106px; }
-            .video-link { right: 40px; bottom: 112px; }
-            .menu-close-btn { right: 40px; top: 40px; }
-        }
-
         @media (max-width: 768px) {
-            html, body { 
-                overflow: hidden !important; 
-                height: 100vh;
-            }
-            
-            .page-wrapper { 
-                padding: 24px 16px 24px 16px; 
-                height: 100vh; 
-                justify-content: space-between; 
-                gap: 0;
-            }
+            html, body { overflow: hidden !important; height: 100vh !important; height: 100lvh !important; }
+            .page-wrapper { padding: 20px 16px 20px 16px; height: 100vh; height: 100lvh; justify-content: space-between; gap: 0; }
+            .bg-watermark { font-size: 130px; letter-spacing: -4px; top: 35%; width: 100%; text-align: center; }
 
-            .bg-watermark { 
-                font-size: 130px; 
-                letter-spacing: -4px; 
-                top: 35%; 
-                width: 100%;
-                text-align: center;
-            }
-
-            /* ИСПРАВЛЕНИЕ: me.png теперь на весь экран по высоте (100vh) и имеет честный сочный цвет */
             .character-container {
-                height: 100vh;
-                width: 100%;
-                transform: translateX(-50%) !important;
-                left: 50% !important;
-                opacity: 1; 
-                filter: none;
-                bottom: 0;
+                height: 100vh; height: 100lvh; width: 100%; transform: translateX(-50%) !important; left: 50% !important;
+                opacity: 1; filter: none; bottom: 0; perspective: 800px; transform-style: preserve-3d;
             }
 
-            .character-img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover; /* Заполняет высоту, аккуратно обрезая края */
-                object-position: center bottom; /* Привязка фокуса к низу */
-            }
-
-            .character-img.base-layer { 
-                -webkit-mask-image: none !important; 
-                mask-image: none !important; 
-            }
+            .character-img { width: 100%; height: 100%; object-fit: cover; object-position: center bottom; will-change: transform; transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+            
+            .character-img.base-layer { -webkit-mask-image: none !important; mask-image: none !important; }
             .character-img.hover-layer { display: none !important; }
 
-            /* ИСПРАВЛЕНИЕ: Контент прибит к низу, кнопка упакована внутрь блока, серый градиент */
             .main-content { 
-                margin-top: auto; 
-                margin-bottom: 0; 
-                width: calc(100% + 32px); /* Растягиваем на всю ширину экрана с учетом паддингов */
-                margin-left: -16px;
-                margin-right: -16px;
-                padding: 40px 16px 24px 16px;
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-end;
-                /* Серый градиент начинается прямо от лейбла "Полный курс" */
-                background: linear-gradient(to top, rgba(166, 172, 181, 1) 0%, rgba(166, 172, 181, 0.95) 60%, rgba(166, 172, 181, 0) 100%);
+                margin-top: auto; margin-bottom: 0; width: calc(100% + 32px); margin-left: -16px; margin-right: -16px;
+                padding: 50px 16px 34px 16px; display: flex; flex-direction: column; justify-content: flex-end;
+                background: linear-gradient(to top, rgba(166, 172, 181, 1) 0%, rgba(166, 172, 181, 0.98) 75%, rgba(166, 172, 181, 0) 100%);
             }
             
-            .main-heading { 
-                font-size: 32px; 
-                letter-spacing: -1px; 
-                margin-bottom: 16px; 
-                line-height: 1.15;
-                color: #ffffff;
-            }
-            
+            .main-heading { font-size: 32px; letter-spacing: -1px; margin-bottom: 16px; line-height: 1.15; color: #ffffff; }
             .label-top { font-size: 16px; }
-            .features-grid { margin-bottom: 24px; } /* Делаем зазор перед кнопкой */
+            .features-grid { margin-bottom: 24px; } 
             .feature-badge { font-size: 11px; padding: 10px 14px; background-color: rgba(22, 27, 36, 0.9); }
             
-            /* Включаем кнопку внутри контента на мобилке */
-            .main-content .btn-cta {
-                display: flex;
-                width: 100%;
-                height: 56px;
-                font-size: 15px;
-                box-shadow: 0 4px 20px rgba(22, 27, 36, 0.2);
-            }
-
+            .main-content .btn-cta { display: flex; width: 100%; height: 56px; font-size: 15px; box-shadow: 0 4px 20px rgba(22, 27, 36, 0.2); }
             .mentor-card, .video-link, .header .btn-cta { display: none !important; }
             .footer-text { display: none !important; } 
 
-            /* Модалка bottom sheet */
-            .overlay-modal {
-                display: flex;
-                align-items: flex-end;
-            }
+            .overlay-modal.active { display: flex; align-items: flex-end; }
             .modal-sheet {
-                top: auto;
-                left: 0;
-                bottom: 0;
-                transform: translateY(100%) scale(1) !important;
-                width: 100%;
-                max-width: 100%;
-                border-radius: 20px 20px 0 0;
-                padding: 32px 16px 44px 16px;
-                transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+                top: auto; left: 0; bottom: 0; transform: translateY(100%) scale(1) !important; width: 100%; max-width: 100%;
+                border-radius: 20px 20px 0 0; padding: 32px 16px 44px 16px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             }
-            .overlay-modal.active .modal-sheet {
-                transform: translateY(0) scale(1) !important;
-            }
+            .overlay-modal.active .modal-sheet { transform: translateY(0) scale(1) !important; }
             .menu-content-wrapper { padding: 40px 24px; }
             .menu-link { font-size: 36px; }
             .menu-close-btn { right: 16px; top: 24px; }
         }
 
-        @keyframes rotate-star {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        @keyframes pulse-ambient {
-            0% { box-shadow: 0 0 0 0 rgba(225, 240, 48, 0.4); }
-            70% { box-shadow: 0 0 0 12px rgba(225, 240, 48, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(225, 240, 48, 0); }
-        }
+        @keyframes rotate-star { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes pulse-ambient { 0% { box-shadow: 0 0 0 0 rgba(225, 240, 48, 0.4); } 70% { box-shadow: 0 0 0 12px rgba(225, 240, 48, 0); } 100% { box-shadow: 0 0 0 0 rgba(225, 240, 48, 0); } }
     </style>
 </head>
 <body>
@@ -872,7 +618,7 @@
 
         <main class="main-content">
             <div class="label-container">
-                <div class="label-top">ПОЛНЫЙ</div>
+                <div class="label-top">ПОЛНЫЙ&nbsp;КУРС</div>
                 <span class="inline-star" aria-hidden="true">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--accent-lime)">
                         <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4Z"/>
@@ -881,9 +627,9 @@
             </div>
             
             <h1 class="main-heading">
-                Курс веб-дизайна
+                Курс&nbsp;веб-дизайна
                 <br>
-                c ментором
+                c&nbsp;ментором
             </h1>
 
             <div class="features-grid">
@@ -892,7 +638,7 @@
                 <span class="feature-badge">Видеоразборы</span>
             </div>
 
-            <button class="btn-cta trigger-modal">
+            <button class="btn-cta trigger-modal" id="mobile-start-btn">
                 Записаться
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <line x1="17" y1="7" x2="7" y2="17"></line>
@@ -931,15 +677,36 @@
         const bookingModal = document.getElementById('booking-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const triggerButtons = document.querySelectorAll('.trigger-modal');
+        const mobileStartBtn = document.getElementById('mobile-start-btn');
 
         let mouseX = 0, mouseY = 0;
-        let targetX = 0; 
-        let currentX = 0; 
+        let targetX = 0, targetY = 0; 
+        let currentX = 0, currentY = 0; 
         let isDesktop = false;
+
+        function initIOSGyro() {
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(permissionState => {
+                        if (permissionState === 'granted') {
+                            window.addEventListener('deviceorientation', handleGyroscope);
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                window.addEventListener('deviceorientation', handleGyroscope);
+            }
+        }
+        
+        mobileStartBtn.addEventListener('click', initIOSGyro, { once: true });
+        burgerBtn.addEventListener('click', initIOSGyro, { once: true });
 
         /* ОТКРЫТИЕ МЕНЮ */
         burgerBtn.addEventListener('click', () => {
-            fullscreenMenu.classList.add('active');
+            fullscreenMenu.style.display = 'block';
+            setTimeout(() => {
+                fullscreenMenu.classList.add('active');
+            }, 10);
             burgerBtn.classList.add('hidden-state'); 
             document.body.classList.add('modal-open');
             closeFormModal();
@@ -948,6 +715,11 @@
         /* ЗАКРЫТИЕ МЕНЮ */
         function closeMainMenu() {
             fullscreenMenu.classList.remove('active');
+            setTimeout(() => {
+                if (!fullscreenMenu.classList.contains('active')) {
+                    fullscreenMenu.style.display = 'none';
+                }
+            }, 400);
             burgerBtn.classList.remove('hidden-state'); 
             if (!bookingModal.classList.contains('active')) {
                 document.body.classList.remove('modal-open');
@@ -965,18 +737,27 @@
             }
         });
 
-        /* ЛОГИКА МОДАЛЬНОГО ОКНА ЗАПИСИ */
+        /* ЛОГИКА ОКНА ЗАПИСИ */
         triggerButtons.forEach(btn => {
             btn.addEventListener('click', () => {
-                bookingModal.classList.add('active');
+                bookingModal.style.display = isDesktop ? 'block' : 'flex';
+                setTimeout(() => {
+                    bookingModal.classList.add('active');
+                }, 10);
                 document.body.classList.add('modal-open');
                 fullscreenMenu.classList.remove('active');
+                fullscreenMenu.style.display = 'none';
                 burgerBtn.classList.remove('hidden-state');
             });
         });
 
         function closeFormModal() {
             bookingModal.classList.remove('active');
+            setTimeout(() => {
+                if (!bookingModal.classList.contains('active')) {
+                    bookingModal.style.display = 'none';
+                }
+            }, 400);
             if(!fullscreenMenu.classList.contains('active')) {
                 document.body.classList.remove('modal-open');
             }
@@ -1002,8 +783,6 @@
             
             if (isDesktop) {
                 imgLayer.style.left = '';
-                imgLayer.style.setProperty('--mask-size', '430px');
-                imgLayer.style.setProperty('--mask-blur', '110px');
             } else {
                 bgLayer.style.transform = '';
                 textLayer.style.transform = '';
@@ -1016,43 +795,51 @@
         mediaQuery.addEventListener('change', handleBreakpointChange);
         handleBreakpointChange(mediaQuery);
 
-        /* ==========================================================================
-           ИСПРАВЛЕНИЕ: ДЕЛИКАТНЫЙ ПАРАЛЛАКС ДЛЯ ДЕСКТОПА (МЫШЬ) И МОБИЛКИ (ГИРОСКОП)
-           ========================================================================== */
-        
-        // Слушатель мыши (Десктоп)
         document.addEventListener('mousemove', (e) => {
             if (!isDesktop) return;
 
             mouseX = e.clientX;
             mouseY = e.clientY;
+            
+            const rect = imgLayer.getBoundingClientRect();
+            const mouseXInContainer = e.clientX - rect.left;
+            const mouseYInContainer = e.clientY - rect.top;
+
+            imgLayer.style.setProperty('--mouse-x', `${mouseXInContainer}px`);
+            imgLayer.style.setProperty('--mouse-y', `${mouseYInContainer}px`);
+
             targetX = (e.clientX / window.innerWidth) - 0.5;
+            targetY = (e.clientY / window.innerHeight) - 0.5;
         });
 
-        // Слушатель гироскопа (Мобилка)
-        window.addEventListener('deviceorientation', (e) => {
+        function handleGyroscope(e) {
             if (isDesktop) return;
             
-            // gamma — это наклон устройства влево/вправо в градусах (от -90 до 90)
             let gamma = e.gamma; 
-            if (gamma === null) return;
+            let beta = e.beta;   
+            
+            if (gamma === null || beta === null) return;
 
-            // Ограничиваем рабочий угол наклона в пределах разумных +-25 градусов для отзывчивости
-            if (gamma > 25) gamma = 25;
-            if (gamma < -25) gamma = -25;
+            if (gamma > 20) gamma = 20;
+            if (gamma < -20) gamma = -20;
+            if (beta > 40) beta = 40;
+            if (beta < 10) beta = 10; 
 
-            // Переводим градусы в диапазон от -0.5 до 0.5 для формулы LERP параллакса
-            targetX = gamma / 50; 
-        });
+            targetX = gamma / 40; 
+            targetY = (beta - 25) / 30; 
+        }
 
-        // Цикл плавной отрисовки кадра (RAF) работает одинаково хорошо для мыши и гироскопа
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') {
+            window.addEventListener('deviceorientation', handleGyroscope);
+        }
+
         function renderParallax() {
-            // Формула сглаживания LERP
             currentX += (targetX - currentX) * 0.08; 
+            currentY += (targetY - currentY) * 0.08; 
 
             const bgSpeed = -35;   
             const textSpeed = -55; 
-            const imgSpeed = 35;   
+            const imgSpeed = 40;   
             const cardSpeed = 60; 
 
             const bgTranslateX = currentX * bgSpeed;
@@ -1068,18 +855,14 @@
                 textLayer.style.transform = `translate(calc(-50% + ${textTranslateX}px), -50%)`;
                 cardLayer.style.transform = `translate(${cardTranslateX}px, -50%)`;
                 imgLayer.style.transform = `translateX(calc(-40% + ${imgTranslateX}px)) perspective(1000px) rotateX(0deg) rotateY(${rotateY}deg)`;
-
-                const rect = imgLayer.getBoundingClientRect();
-                const mouseXInContainer = mouseX - rect.left;
-                const mouseYInContainer = mouseY - rect.top;
-
-                imgLayer.style.setProperty('--mouse-x', `${mouseXInContainer}px`);
-                imgLayer.style.setProperty('--mouse-y', `${mouseYInContainer}px`);
             } else {
-                // На мобилке смещаем только фон, водяной знак и картинку, убирая тяжелый поворот по оси Y
-                bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX}px), -50%)`;
-                textLayer.style.transform = `translate(calc(-50% + ${textTranslateX}px), -50%)`;
-                imgLayer.style.transform = `translate(calc(-50% + ${imgTranslateX * 0.5}px), 0)`; // Чуть уменьшаем смещение силуэта для баланса
+                const rotateY = currentX * 18; 
+                const rotateX = -currentY * 12; 
+                
+                bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX}px), calc(-50% + ${currentY * bgSpeed}px))`;
+                textLayer.style.transform = `translate(calc(-50% + ${textTranslateX}px), calc(-50% + ${currentY * textSpeed}px))`;
+                
+                imgLayer.style.transform = `translateX(calc(-50% + ${imgTranslateX}px)) translateY(${currentY * 15}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
             }
             
             requestAnimationFrame(renderParallax);
