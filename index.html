@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Banner - 1920px Constrained Layout</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;600&family=Unbounded:wght@200;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-main: #A6ACB5;       
+            --accent-lime: #E1F030;   
+            --text-gray: #C5C9CF;     
+            --text-dark: #161B24;     
+            --card-bg: #161B24; 
+            --font-unbounded: 'Unbounded', sans-serif;
+            --font-mulish: 'Mulish', sans-serif;
+            
+            /* Переменные для динамической маски фона и фокуса */
+            --mouse-x: 50%;
+            --mouse-y: 50%;
+            --mask-size: 0px; 
+            --mask-blur: 0px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            min-height: 100vh;
+            width: 100%; /* ИСПРАВЛЕНИЕ: Заменено со 100vw для предотвращения потенциального горизонтального скролла */
+            position: relative;
+            overflow: hidden;
+            font-family: var(--font-unbounded);
+        }
+
+        body.modal-open {
+            overflow: hidden;
+        }
+
+        .parallax-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 110vw; 
+            height: 110vh;
+            transform: translate(-50%, -50%);
+            background-image: url('bg.svg');
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            z-index: 0; 
+            pointer-events: none;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
+        }
+
+        .bg-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 460px;
+            font-weight: 200;
+            line-height: 0.8;
+            letter-spacing: -25px;
+            white-space: nowrap;
+            z-index: 1; 
+            pointer-events: none;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
+        }
+
+        .bg-watermark .gray-letter { color: var(--text-gray); }
+        .bg-watermark .lime-slash { color: var(--accent-lime); }
+
+        .character-container {
+            position: absolute;
+            bottom: 0;               
+            left: 50%;
+            transform: translateX(-40%); 
+            width: 70vh; /* ИСПРАВЛЕНИЕ: Добавлен базовый размер во избежание CLS (Layout Shift) до загрузки картинки */
+            height: 100vh;           
+            z-index: 3;             
+            pointer-events: none; 
+            will-change: transform;
+            transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            filter: drop-shadow(8px 12px 20px rgba(22, 27, 36, 0.2));
+            transform-origin: bottom center;
+        }
+
+        .character-img {
+            height: 100%;
+            width: auto;
+            object-fit: contain;
+            display: block;
+        }
+
+        /* Маска для ОРИГИНАЛЬНОГО изображения */
+        .character-img.base-layer {
+            -webkit-mask-image: radial-gradient(
+                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
+                transparent calc(var(--mask-size) - var(--mask-blur)), 
+                black var(--mask-size)
+            );
+            mask-image: radial-gradient(
+                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
+                transparent calc(var(--mask-size) - var(--mask-blur)), 
+                black var(--mask-size)
+            );
+        }
+
+        /* Маска для ЭФФЕКТА */
+        .character-img.hover-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            
+            -webkit-mask-image: radial-gradient(
+                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
+                black calc(var(--mask-size) - var(--mask-blur)), 
+                transparent var(--mask-size)
+            );
+            mask-image: radial-gradient(
+                circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
+                black calc(var(--mask-size) - var(--mask-blur)), 
+                transparent var(--mask-size)
+            );
+        }
+
+        .page-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 1920px;
+            height: 100vh;
+            margin: 0 auto; 
+            padding: 64px 80px; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            pointer-events: none; 
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between; 
+            align-items: center;
+            z-index: 10;
+            width: 100%;
+            pointer-events: auto;
+        }
+
+        .logo-img {
+            width: 209px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 12px; 
+        }
+
+        .btn-cta {
+            background-color: var(--accent-lime);
+            color: var(--text-dark); 
+            border: none;
+            height: 54px; 
+            padding: 0 28px;
+            font-family: var(--font-unbounded);
+            font-weight: 400;
+            font-size: 16px;
+            text-transform: uppercase;
+            border-radius: 8px; 
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 0 0 rgba(225, 240, 48, 0.4);
+            animation: pulse-ambient 2s infinite;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(225, 240, 48, 0.4);
+            background-color: #f2ff44;
+        }
+
+        .btn-cta svg {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-cta:hover svg {
+            transform: translate(2px, -2px);
+        }
+
+        /* Кнопка бургера на главной */
+        .burger-btn {
+            background: rgba(22, 27, 36, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 54px;
+            height: 54px; 
+            border-radius: 8px; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .burger-btn:hover {
+            background: rgba(22, 27, 36, 0.3);
+        }
+
+        .burger-btn.hidden-state {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8);
+        }
+
+        .mentor-card {
+            position: absolute;
+            right: 146px; 
+            top: 45%;
+            transform: translateY(-50%);
+            width: fit-content; 
+            max-width: 440px;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            pointer-events: auto;
+            will-change: transform;
+            transition: transform 0.1s ease-out;
+        }
+
+        .mentor-card-badge {
+            background-color: var(--card-bg); 
+            color: #ffffff;
+            font-family: var(--font-unbounded);
+            font-size: 12px;           
+            font-weight: 400;          
+            padding: 18px 32px 12px 32px; 
+            width: fit-content;
+            border-top-left-radius: 8px;  
+            border-top-right-radius: 8px; 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: -1px; 
+        }
+
+        .mentor-card-body {
+            background-color: var(--card-bg); 
+            padding: 32px;             
+            border-radius: 8px; 
+            border-top-left-radius: 0px; 
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .mentor-name {
+            font-family: var(--font-unbounded);
+            font-weight: 400;          
+            font-size: 24px;           
+            color: var(--accent-lime); 
+            text-transform: uppercase;
+            margin-bottom: 20px;
+            letter-spacing: -0.5px;
+            line-height: 1.2;
+            white-space: nowrap; 
+        }
+
+        .mentor-role {
+            font-family: var(--font-mulish);
+            font-weight: 600;          
+            font-size: 18px;           
+            color: #ffffff;
+            line-height: 1.4;
+            margin-bottom: 12px;
+        }
+
+        .mentor-experience {
+            font-family: var(--font-mulish);
+            font-weight: 600;          
+            font-size: 18px;           
+            color: #A6ACB5;
+        }
+
+        .main-content {
+            z-index: 5;
+            margin-top: auto;        
+            margin-right: auto;      
+            margin-bottom: 40px;     
+            position: relative;
+            pointer-events: auto;
+        }
+
+        .label-container {
+            display: flex;
+            align-items: center;
+            gap: 15px; 
+            margin-bottom: 5px; 
+        }
+
+        .label-top {
+            color: var(--accent-lime); 
+            font-weight: 400; 
+            font-size: 24px;  
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            line-height: 1;
+        }
+
+        .inline-star {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            animation: rotate-star 12s linear infinite;
+        }
+
+        .main-heading {
+            font-weight: 500; 
+            font-size: 72px;  
+            line-height: 1.15;
+            color: #ffffff;
+            text-transform: uppercase;
+            max-width: 1000px;
+            margin-bottom: 40px;
+            letter-spacing: -2px;
+        }
+
+        .features-grid {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .feature-badge {
+            background-color: var(--text-dark); 
+            color: var(--accent-lime);       
+            font-family: var(--font-unbounded);
+            font-weight: 400; 
+            font-size: 16px;  
+            padding: 14px 28px;
+            border-radius: 30px;
+            border: none;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+
+        .video-link {
+            position: absolute;
+            right: 80px; 
+            bottom: 112px; 
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            text-decoration: none;
+            color: #ffffff;
+            font-size: 16px;  
+            font-weight: 400; 
+            max-width: 260px; 
+            line-height: 1.4;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .play-circle {
+            width: 60px;  
+            height: 60px; 
+            border: 2px solid var(--accent-lime); 
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-shrink: 0;
+            background: transparent;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 0 0 0 rgba(225, 240, 48, 0.3);
+        }
+
+        .video-link:hover .play-circle {
+            transform: scale(1.1);
+            background: var(--accent-lime);
+            box-shadow: 0 0 15px rgba(225, 240, 48, 0.5);
+        }
+
+        .play-circle svg {
+            transition: all 0.3s ease;
+        }
+
+        .video-link:hover .play-circle svg {
+            fill: var(--text-dark);
+            transform: scale(1.1);
+        }
+
+        .video-link span {
+            transition: color 0.3s ease;
+        }
+        
+        .video-link:hover span {
+            color: var(--accent-lime);
+        }
+
+        .footer-text {
+            font-family: var(--font-mulish); 
+            font-size: 10px;                 
+            font-weight: 400; 
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 900px;
+            line-height: 1.5;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        .mobile-fixed-btn-wrapper {
+            display: none;
+        }
+
+        /* ==========================================================================
+           МОДАЛЬНОЕ ОКНО И МЕНЮ
+           ========================================================================== */
+        
+        .overlay-modal, .fullscreen-menu {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(22, 27, 36, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .overlay-modal.active, .fullscreen-menu.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .menu-close-btn {
+            position: absolute;
+            top: 64px;
+            right: 80px;
+            background: rgba(22, 27, 36, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 54px;
+            height: 54px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .menu-close-btn:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.6);
+            transform: scale(1.05);
+        }
+
+        /* Модальное окно записи */
+        .modal-sheet {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -45%) scale(0.95);
+            width: 100%;
+            max-width: 520px;
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .overlay-modal.active .modal-sheet {
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            background: rgba(255,255,255,0.05);
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #ffffff;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(255,255,255,0.15);
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 500;
+            color: #ffffff;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .modal-subtitle {
+            font-family: var(--font-mulish);
+            font-size: 16px;
+            color: var(--text-gray);
+            margin-bottom: 32px;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-family: var(--font-mulish);
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--accent-lime);
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .form-input {
+            width: 100%;
+            height: 54px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 0 18px;
+            font-family: var(--font-mulish);
+            color: #ffffff;
+            font-size: 16px;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent-lime);
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .modal-sheet .btn-submit {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        /* Полноэкранное меню */
+        .menu-content-wrapper {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px;
+            max-width: 1920px;
+            margin: 0 auto;
+        }
+
+        .menu-nav {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            width: fit-content; 
+        }
+
+        .menu-link {
+            font-size: 48px;
+            font-weight: 400;
+            color: #ffffff;
+            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+            width: fit-content;
+            transition: color 0.25s ease, transform 0.25s ease;
+        }
+
+        .fullscreen-menu .menu-link {
+            transform: translateY(20px);
+            opacity: 0;
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1), transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        .fullscreen-menu.active .menu-link {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .fullscreen-menu.active .menu-link:nth-child(1) { transition-delay: 0.05s; }
+        .fullscreen-menu.active .menu-link:nth-child(2) { transition-delay: 0.10s; }
+        .fullscreen-menu.active .menu-link:nth-child(3) { transition-delay: 0.15s; }
+        .fullscreen-menu.active .menu-link:nth-child(4) { transition-delay: 0.20s; }
+
+        .menu-link:hover {
+            color: var(--accent-lime) !important;
+            transform: translateX(12px) !important;
+            transition-delay: 0s !important; 
+        }
+
+        .menu-footer {
+            margin-top: 64px;
+            display: flex;
+            gap: 32px;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: transform 0.4s ease 0.25s, opacity 0.4s ease 0.25s;
+            width: fit-content;
+        }
+
+        .fullscreen-menu.active .menu-footer {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .menu-social-link {
+            font-family: var(--font-mulish);
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-gray);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        .menu-social-link:hover {
+            color: var(--accent-lime);
+        }
+
+        /* ==========================================================================
+           АДАПТИВНОСТЬ
+           ========================================================================== */
+        @media (max-width: 1400px) {
+            .bg-watermark { font-size: 320px; letter-spacing: -15px; }
+            .main-heading { font-size: 54px; }
+            .page-wrapper { padding: 40px 40px; }
+            .mentor-card { right: 106px; }
+            .video-link { right: 40px; bottom: 112px; }
+            .menu-close-btn { right: 40px; top: 40px; }
+        }
+
+        @media (max-width: 768px) {
+            body { overflow-y: auto; }
+            .page-wrapper { padding: 24px 16px 120px 16px; height: auto; min-height: 100vh; justify-content: flex-start; gap: 40px; }
+            .mentor-card { display: none !important; }
+            .video-link { display: none !important; }
+            .header .btn-cta { display: none !important; }
+
+            .bg-watermark { font-size: 140px; letter-spacing: -5px; top: 40%; }
+
+            .character-container {
+                height: 70vh;
+                width: auto;
+                transform: translateX(-50%) !important;
+                left: 50% !important;
+                opacity: 0.85; 
+                filter: none; 
+            }
+
+            .character-img.base-layer { -webkit-mask-image: none !important; mask-image: none !important; }
+            .character-img.hover-layer { display: none !important; }
+
+            .main-content { margin-top: 20px; margin-bottom: 0; }
+            .main-heading { font-size: 34px; letter-spacing: -1px; margin-bottom: 24px; }
+            .label-top { font-size: 18px; }
+            .feature-badge { font-size: 12px; padding: 10px 18px; }
+            .footer-text { margin-top: auto; font-size: 9px; }
+
+            .mobile-fixed-btn-wrapper {
+                display: block;
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                background: linear-gradient(to top, rgba(22, 27, 36, 0.95) 70%, rgba(22, 27, 36, 0));
+                padding: 24px 16px;
+                z-index: 999;
+                pointer-events: auto;
+            }
+
+            .mobile-fixed-btn-wrapper .btn-cta { width: 100%; height: 56px; border-radius: 8px; font-size: 15px; }
+
+            .overlay-modal {
+                display: flex;
+                align-items: flex-end;
+            }
+            .modal-sheet {
+                top: auto;
+                left: 0;
+                bottom: 0;
+                transform: translateY(100%) scale(1) !important;
+                width: 100%;
+                max-width: 100%;
+                border-radius: 20px 20px 0 0;
+                padding: 32px 16px 44px 16px;
+                transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            }
+            .overlay-modal.active .modal-sheet {
+                transform: translateY(0) scale(1) !important;
+            }
+            .menu-content-wrapper { padding: 40px 24px; }
+            .menu-link { font-size: 36px; }
+            .menu-close-btn { right: 16px; top: 24px; }
+        }
+
+        @keyframes rotate-star {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-ambient {
+            0% { box-shadow: 0 0 0 0 rgba(225, 240, 48, 0.4); }
+            70% { box-shadow: 0 0 0 12px rgba(225, 240, 48, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(225, 240, 48, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="parallax-bg" id="parallax-bg"></div>
+
+    <div class="bg-watermark" id="parallax-text">
+        <span class="gray-letter">UI</span><span class="lime-slash">/</span><span class="gray-letter">UX</span><span class="lime-slash">/</span><span class="gray-letter">AI</span>
+    </div>
+    
+    <div class="character-container" id="parallax-img">
+        <img src="me.png" alt="Mentor" class="character-img base-layer">
+        <img src="me2.png" alt="Mentor Effect" class="character-img hover-layer">
+    </div>
+
+    <div class="fullscreen-menu" id="fullscreen-menu">
+        <button class="menu-close-btn" id="menu-close-btn" aria-label="Закрыть меню">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+        </button>
+        
+        <div class="menu-content-wrapper" id="menu-content-wrapper">
+            <nav class="menu-nav" id="menu-nav">
+                <a href="#" class="menu-link">Программа курса</a>
+                <a href="#" class="menu-link">О менторе</a>
+                <a href="#" class="menu-link">Отзывы студентов</a>
+                <a href="#" class="menu-link">Контакты</a>
+            </nav>
+            <div class="menu-footer" id="menu-footer">
+                <a href="#" class="menu-social-link">Telegram</a>
+                <a href="#" class="menu-social-link">Instagram</a>
+                <a href="#" class="menu-social-link">Behance</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="overlay-modal" id="booking-modal">
+        <div class="modal-sheet">
+            <button class="modal-close-btn" id="close-modal-btn" aria-label="Закрыть модальное окно">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <h2 class="modal-title">Запись на курс</h2>
+            <p class="modal-subtitle">Оставьте ваши контакты, и ментор свяжется с вами для персональной консультации.</p>
+            
+            <form id="booking-form" onsubmit="event.preventDefault(); alert('Успешная запись!');">
+                <div class="form-group">
+                    <label class="form-label" for="user-name">Ваше имя</label>
+                    <input type="text" id="user-name" class="form-input" placeholder="Александр" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="user-contact">Телефон или Telegram</label>
+                    <input type="text" id="user-contact" class="form-input" placeholder="+375 (29) 000-00-00" required>
+                </div>
+                <button type="submit" class="btn-cta btn-submit">Отправить заявку</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="page-wrapper">
+        
+        <header class="header">
+            <img src="logo.svg" alt="Logo" class="logo-img">
+            <div class="header-controls">
+                <button class="btn-cta trigger-modal">
+                    Записаться
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <line x1="17" y1="7" x2="7" y2="17"></line>
+                        <polyline points="17 17 7 17 7 7"></polyline>
+                    </svg>
+                </button>
+                <button class="burger-btn" id="burger-btn" aria-label="Открыть меню">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                        <line x1="4" y1="6" x2="20" y2="6"></line>
+                        <line x1="4" y1="12" x2="20" y2="12"></line>
+                        <line x1="4" y1="18" x2="20" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
+        </header>
+
+        <div class="mentor-card" id="parallax-card">
+            <div class="mentor-card-badge">Ментор</div>
+            <div class="mentor-card-body">
+                <h3 class="mentor-name">Александр Креа</h3>
+                <p class="mentor-role">Senior UX/UI & Product Designer</p>
+                <p class="mentor-experience">15+ лет опыта</p>
+            </div>
+        </div>
+
+        <main class="main-content">
+            <div class="label-container">
+                <div class="label-top">ПОЛНЫЙ</div>
+                <span class="inline-star" aria-hidden="true">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--accent-lime)">
+                        <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4Z"/>
+                    </svg>
+                </span>
+            </div>
+            
+            <h1 class="main-heading">
+                Курс веб-дизайна
+                <br>
+                c ментором
+            </h1>
+
+            <div class="features-grid">
+                <span class="feature-badge">Персональные консультации</span>
+                <span class="feature-badge">Много практики</span>
+                <span class="feature-badge">Видеоразборы</span>
+            </div>
+        </main>
+
+        <a href="#" class="video-link">
+            <div class="play-circle">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="var(--accent-lime)" aria-hidden="true">
+                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                </svg>
+            </div>
+            <span>О ВЕБ-ДИЗАЙНЕ<br>И МЕНТОРЕ</span>
+        </a>
+
+        <footer class="footer-text">
+            * Консультирование по дисциплине «Веб-дизайн и компьютерная графика» БГУ ФСК с 1 по 3 курс и обучение работе на фрилансе.
+        </footer>
+
+    </div>
+
+    <div class="mobile-fixed-btn-wrapper">
+        <button class="btn-cta trigger-modal">
+            Записаться
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="17" y1="7" x2="7" y2="17"></line>
+                <polyline points="17 17 7 17 7 7"></polyline>
+            </svg>
+        </button>
+    </div>
+
+    <script>
+        const bgLayer = document.getElementById('parallax-bg');
+        const textLayer = document.getElementById('parallax-text');
+        const imgLayer = document.getElementById('parallax-img');
+        const cardLayer = document.getElementById('parallax-card');
+
+        // Модалки
+        const burgerBtn = document.getElementById('burger-btn');
+        const menuCloseBtn = document.getElementById('menu-close-btn');
+        const fullscreenMenu = document.getElementById('fullscreen-menu');
+        const menuNav = document.getElementById('menu-nav');
+        const menuFooter = document.getElementById('menu-footer');
+        const bookingModal = document.getElementById('booking-modal');
+        const closeModalBtn = document.getElementById('close-modal-btn');
+        const triggerButtons = document.querySelectorAll('.trigger-modal');
+
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0; 
+        let currentX = 0; 
+        let isDesktop = false;
+
+        /* ОТКРЫТИЕ МЕНЮ */
+        burgerBtn.addEventListener('click', () => {
+            fullscreenMenu.classList.add('active');
+            burgerBtn.classList.add('hidden-state'); 
+            document.body.classList.add('modal-open');
+            closeFormModal();
+        });
+
+        /* ЗАКРЫТИЕ МЕНЮ */
+        function closeMainMenu() {
+            fullscreenMenu.classList.remove('active');
+            burgerBtn.classList.remove('hidden-state'); 
+            if (!bookingModal.classList.contains('active')) {
+                document.body.classList.remove('modal-open');
+            }
+        }
+
+        menuCloseBtn.addEventListener('click', (e) => {
+            e.stopPropagation(); 
+            closeMainMenu();
+        });
+
+        fullscreenMenu.addEventListener('click', (e) => {
+            if (!menuNav.contains(e.target) && !menuFooter.contains(e.target) && e.target !== menuCloseBtn) {
+                closeMainMenu();
+            }
+        });
+
+        /* ЛОГИКА МОДАЛЬНОГО ОКНА ЗАПИСИ */
+        triggerButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                bookingModal.classList.add('active');
+                document.body.classList.add('modal-open');
+                fullscreenMenu.classList.remove('active');
+                burgerBtn.classList.remove('hidden-state');
+            });
+        });
+
+        function closeFormModal() {
+            bookingModal.classList.remove('active');
+            if(!fullscreenMenu.classList.contains('active')) {
+                document.body.classList.remove('modal-open');
+            }
+        }
+
+        closeModalBtn.addEventListener('click', closeFormModal);
+
+        bookingModal.addEventListener('click', (e) => {
+            if (e.target === bookingModal) closeFormModal();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeFormModal();
+                closeMainMenu();
+            }
+        });
+
+        /* ==========================================================================
+           ИСПРАВЛЕНИЕ: ДИНАМИЧЕСКИЙ РЕСАЙЗ ЧЕРЕЗ window.matchMedia (ПРОИЗВОДИТЕЛЬНОСТЬ)
+           ========================================================================== */
+        const mediaQuery = window.matchMedia('(min-width: 769px)');
+
+        function handleBreakpointChange(e) {
+            isDesktop = e.matches;
+            
+            if (isDesktop) {
+                // Если переключились на десктоп — возвращаем маски и сбрасываем left
+                imgLayer.style.left = '';
+                imgLayer.style.setProperty('--mask-size', '430px');
+                imgLayer.style.setProperty('--mask-blur', '110px');
+            } else {
+                // Если ушли на мобилку — полностью очищаем инлайновые стили параллакса
+                bgLayer.style.transform = '';
+                textLayer.style.transform = '';
+                cardLayer.style.transform = '';
+                imgLayer.style.transform = 'translateX(-50%)';
+                imgLayer.style.left = '50%';
+            }
+        }
+
+        // Подписываемся на изменения и делаем первичный запуск
+        mediaQuery.addEventListener('change', handleBreakpointChange);
+        handleBreakpointChange(mediaQuery);
+
+        // Слушатель мыши собирает координаты только на десктопах
+        document.addEventListener('mousemove', (e) => {
+            if (!isDesktop) return;
+
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            targetX = (e.clientX / window.innerWidth) - 0.5;
+        });
+
+        // Функция плавной анимации (LERP) через RequestAnimationFrame
+        function renderParallax() {
+            if (isDesktop) {
+                currentX += (targetX - currentX) * 0.08; 
+
+                const bgSpeed = -35;   
+                const textSpeed = -55; 
+                const imgSpeed = 35;   
+                const cardSpeed = 60; 
+
+                const bgTranslateX = currentX * bgSpeed;
+                const textTranslateX = currentX * textSpeed;
+                const imgTranslateX = currentX * imgSpeed;
+                const cardTranslateX = currentX * cardSpeed;
+
+                const maxRotateY = 0.2; 
+                const rotateY = -currentX * maxRotateY; 
+
+                // Рендерим слои параллакса
+                bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX}px), -50%)`;
+                textLayer.style.transform = `translate(calc(-50% + ${textTranslateX}px), -50%)`;
+                cardLayer.style.transform = `translate(${cardTranslateX}px, -50%)`;
+                imgLayer.style.transform = `translateX(calc(-40% + ${imgTranslateX}px)) perspective(1000px) rotateX(0deg) rotateY(${rotateY}deg)`;
+
+                // Вычисление положения фонарика внутри контейнера
+                const rect = imgLayer.getBoundingClientRect();
+                const mouseXInContainer = mouseX - rect.left;
+                const mouseYInContainer = mouseY - rect.top;
+
+                imgLayer.style.setProperty('--mouse-x', `${mouseXInContainer}px`);
+                imgLayer.style.setProperty('--mouse-y', `${mouseYInContainer}px`);
+            }
+            
+            requestAnimationFrame(renderParallax);
+        }
+
+        // Запуск бесконечного цикла рендера
+        requestAnimationFrame(renderParallax);
+    </script>
+</body>
+</html>
