@@ -48,8 +48,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 110vw; 
-            height: 110vh;
+            width: 130vw; 
+            height: 130vh;
             transform: translate(-50%, -50%);
             background-image: url('bg.svg');
             background-position: center;
@@ -99,11 +99,12 @@
             display: block;
         }
 
+        /* ИСПРАВЛЕНИЕ: Область 100% эффекта увеличена до 260px, общий радиус до 480px */
         .character-img.base-layer {
             position: relative;
             z-index: 1;
-            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 160px, black 360px);
-            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 160px, black 360px);
+            -webkit-mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 480px);
+            mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 480px);
         }
 
         .character-img.hover-layer {
@@ -111,8 +112,8 @@
             top: 0;
             left: 0;
             z-index: 2;
-            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 160px, transparent 360px);
-            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 160px, transparent 360px);
+            -webkit-mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 480px);
+            mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 480px);
         }
 
         .page-wrapper {
@@ -470,25 +471,25 @@
         .menu-social-link:hover { color: var(--accent-lime); }
 
         /* ==========================================================================
-           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ФИНАЛЬНЫЙ ТЮНИНГ)
+           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ИСПРАВЛЕНИЯ IOS И ТАББАРА)
            ========================================================================== */
         @media (max-width: 768px) {
             html, body { overflow: hidden !important; height: 100vh !important; height: 100lvh !important; }
             .page-wrapper { padding: 20px 16px 20px 16px; height: 100vh; height: 100lvh; justify-content: space-between; gap: 0; }
             .bg-watermark { font-size: 130px; letter-spacing: -4px; top: 35%; width: 100%; text-align: center; }
 
-            /* Контейнер me.png под экстремальное 3D */
             .character-container {
                 height: 100vh; height: 100lvh; width: 100%; transform: translateX(-50%) !important; left: 50% !important;
                 opacity: 1; filter: none; bottom: 0; 
-                perspective: 1000px; 
-                transform-style: preserve-3d;
+                /* Убран гироскопический наклон, возвращен чистый CSS параллакс */
+                perspective: none; 
+                transform-style: flat;
             }
 
             .character-img { 
                 width: 100%; height: 100%; object-fit: cover; object-position: center bottom; 
                 will-change: transform; 
-                transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1); 
+                transition: transform 0.1s ease-out; 
             }
             
             .character-img.base-layer { -webkit-mask-image: none !important; mask-image: none !important; }
@@ -497,13 +498,14 @@
             /* Главный контент с увеличенной охранной зоной снизу против меню браузера */
             .main-content { 
                 margin-top: auto; margin-bottom: 0; width: calc(100% + 32px); margin-left: -16px; margin-right: -16px;
-                /* ИСПРАВЛЕНИЕ: Выставили нижний отступ 70px. Теперь кнопка гарантированно приподнята над нативными плашками */
-                padding: 50px 16px 70px 16px; 
+                /* ИСПРАВЛЕНИЕ: Отступ увеличен до 100px — теперь кнопка гарантированно выше шторки iPhone 12 Pro */
+                padding: 50px 16px 100px 16px; 
                 display: flex; flex-direction: column; justify-content: flex-end;
-                background: linear-gradient(to top, rgba(166, 172, 181, 1) 0%, rgba(166, 172, 181, 0.98) 75%, rgba(166, 172, 181, 0) 100%);
+                /* ИСПРАВЛЕНИЕ: Градиент сделан более прозрачным (0.8 вместо 0.98) */
+                background: linear-gradient(to top, rgba(166, 172, 181, 0.8) 0%, rgba(166, 172, 181, 0.7) 75%, rgba(166, 172, 181, 0) 100%);
             }
             
-            /* ИСПРАВЛЕНИЕ: Увеличен размер заголовка до 38px для дерзкого контраста */
+            /* ИСПРАВЛЕНИЕ: Размер увеличен до 38px */
             .main-heading { font-size: 38px; letter-spacing: -1.5px; margin-bottom: 18px; line-height: 1.15; color: #ffffff; }
             .label-top { font-size: 16px; }
             .features-grid { margin-bottom: 24px; } 
@@ -513,12 +515,19 @@
             .mentor-card, .video-link, .header .btn-cta { display: none !important; }
             .footer-text { display: none !important; } 
 
-            .overlay-modal.active { display: flex; align-items: flex-end; }
+            /* ИСПРАВЛЕНИЕ: Центрируем модалку по флексу вместо нижнего прижатия, чтобы её не резал браузер */
+            .overlay-modal.active { display: flex; align-items: center; justify-content: center; padding: 16px; }
             .modal-sheet {
-                top: auto; left: 0; bottom: 0; transform: translateY(100%) scale(1) !important; width: 100%; max-width: 100%;
-                border-radius: 20px 20px 0 0; padding: 32px 16px 44px 16px; transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+                position: relative;
+                top: auto; left: auto; bottom: auto; transform: scale(0.95) !important; 
+                width: 100%; max-width: 440px;
+                border-radius: 16px; 
+                /* ИСПРАВЛЕНИЕ: Добавлены жесткие внутренние отступы, включая безопасную зону снизу */
+                padding: 32px 20px 60px 20px; 
+                transition: transform 0.3s ease;
             }
-            .overlay-modal.active .modal-sheet { transform: translateY(0) scale(1) !important; }
+            .overlay-modal.active .modal-sheet { transform: scale(1) !important; }
+            
             .menu-content-wrapper { padding: 40px 24px; }
             .menu-link { font-size: 36px; }
             .menu-close-btn { right: 16px; top: 24px; }
@@ -622,7 +631,8 @@
 
         <main class="main-content">
             <div class="label-container">
-                <div class="label-top">ПОЛНЫЙ&nbsp;КУРС</div>
+                <!-- ИСПРАВЛЕНИЕ: Заменено на ПОЛНЫЙ -->
+                <div class="label-top">ПОЛНЫЙ</div>
                 <span class="inline-star" aria-hidden="true">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--accent-lime)">
                         <path d="M12 0L14.6 9.4L24 12L14.6 14.6L12 24L9.4 14.6L0 12L9.4 9.4Z"/>
@@ -682,29 +692,11 @@
         const bookingModal = document.getElementById('booking-modal');
         const closeModalBtn = document.getElementById('close-modal-btn');
         const triggerButtons = document.querySelectorAll('.trigger-modal');
-        const mobileStartBtn = document.getElementById('mobile-start-btn');
 
         let mouseX = 0, mouseY = 0;
         let targetX = 0, targetY = 0; 
         let currentX = 0, currentY = 0; 
         let isDesktop = false;
-
-        function initIOSGyro() {
-            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-                DeviceOrientationEvent.requestPermission()
-                    .then(permissionState => {
-                        if (permissionState === 'granted') {
-                            window.addEventListener('deviceorientation', handleGyroscope);
-                        }
-                    })
-                    .catch(console.error);
-            } else {
-                window.addEventListener('deviceorientation', handleGyroscope);
-            }
-        }
-        
-        mobileStartBtn.addEventListener('click', initIOSGyro, { once: true });
-        burgerBtn.addEventListener('click', initIOSGyro, { once: true });
 
         /* ОТКРЫТИЕ МЕНЮ */
         burgerBtn.addEventListener('click', () => {
@@ -752,67 +744,56 @@
 
         function handleBreakpointChange(e) {
             isDesktop = e.matches;
-            if (isDesktop) {
-                imgLayer.style.left = '';
-            } else {
-                // Сброс статических трансформаций для мобилки
-                bgLayer.style.transform = '';
-                textLayer.style.transform = '';
-                cardLayer.style.transform = '';
-                imgLayer.style.transform = 'translateX(-50%)';
-                imgLayer.style.left = '50%';
-            }
+            
+            // Сброс трансформаций для чистого пересчета
+            bgLayer.style.transform = '';
+            textLayer.style.transform = '';
+            cardLayer.style.transform = '';
+            imgLayer.style.transform = isDesktop ? '' : 'translateX(-50%)';
+            if (!isDesktop) imgLayer.style.left = '50%';
         }
 
         mediaQuery.addEventListener('change', handleBreakpointChange);
         handleBreakpointChange(mediaQuery);
 
+        /* СЛУШАТЕЛЬ ДВИЖЕНИЯ (МЫШЬ НА ПК / ТАЧ НА СМАРТФОНЕ) */
         document.addEventListener('mousemove', (e) => {
             if (!isDesktop) return;
-
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            const rect = imgLayer.getBoundingClientRect();
-            const mouseXInContainer = e.clientX - rect.left;
-            const mouseYInContainer = e.clientY - rect.top;
-
-            imgLayer.style.setProperty('--mouse-x', `${mouseXInContainer}px`);
-            imgLayer.style.setProperty('--mouse-y', `${mouseYInContainer}px`);
-
-            targetX = (e.clientX / window.innerWidth) - 0.5;
-            targetY = (e.clientY / window.innerHeight) - 0.5;
+            handleMove(e.clientX, e.clientY);
         });
 
-        function handleGyroscope(e) {
+        // На мобилках возвращаем стабильный параллакс от свайпа пальцем
+        document.addEventListener('touchmove', (e) => {
             if (isDesktop) return;
+            if (e.touches.length > 0) {
+                handleMove(e.touches[0].clientX, e.touches[0].clientY);
+            }
+        }, { passive: true });
+
+        function handleMove(clientX, clientY) {
+            mouseX = clientX;
+            mouseY = clientY;
             
-            let gamma = e.gamma; 
-            let beta = e.beta;   
-            
-            if (gamma === null || beta === null) return;
+            // Расчет фонарика для маски на ПК
+            if (isDesktop) {
+                const rect = imgLayer.getBoundingClientRect();
+                const mouseXInContainer = clientX - rect.left;
+                const mouseYInContainer = clientY - rect.top;
+                imgLayer.style.setProperty('--mouse-x', `${mouseXInContainer}px`);
+                imgLayer.style.setProperty('--mouse-y', `${mouseYInContainer}px`);
+            }
 
-            if (gamma > 20) gamma = 20;
-            if (gamma < -20) gamma = -20;
-            if (beta > 40) beta = 40;
-            if (beta < 10) beta = 10; 
-
-            targetX = gamma / 40; 
-            targetY = (beta - 25) / 30; 
-        }
-
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission !== 'function') {
-            window.addEventListener('deviceorientation', handleGyroscope);
+            targetX = (clientX / window.innerWidth) - 0.5;
+            targetY = (clientY / window.innerHeight) - 0.5;
         }
 
         function renderParallax() {
             currentX += (targetX - currentX) * 0.08; 
             currentY += (targetY - currentY) * 0.08; 
 
-            // ИСПРАВЛЕНИЕ: Вынесли все коэффициенты 3D-движения исключительно на силуэт ментора для мобилки
             const bgSpeed = -35;   
             const textSpeed = -55; 
-            const imgSpeed = 45;   
+            const imgSpeed = 40;   
             const cardSpeed = 60; 
 
             const bgTranslateX = currentX * bgSpeed;
@@ -829,12 +810,10 @@
                 cardLayer.style.transform = `translate(${cardTranslateX}px, -50%)`;
                 imgLayer.style.transform = `translateX(calc(-40% + ${imgTranslateX}px)) perspective(1000px) rotateX(0deg) rotateY(${rotateY}deg)`;
             } else {
-                // ИСПРАВЛЕНИЕ: 3D эффект кренится и разворачивается СТРОГО на me.png (imgLayer), 
-                // задний фон и фейковый текст водяного знака остаются зафиксированными монолитно
-                const rotateY = currentX * 22; 
-                const rotateX = -currentY * 15; 
-                
-                imgLayer.style.transform = `translateX(calc(-50% + ${imgTranslateX}px)) translateY(${currentY * 18}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                // Стабильный, отзывчивый параллакс-смещение для всей глубины слоев на мобилке
+                bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX * 0.4}px), calc(-50% + ${currentY * bgSpeed * 0.4}px))`;
+                textLayer.style.transform = `translate(calc(-50% + ${textTranslateX * 0.6}px), calc(-50% + ${currentY * textSpeed * 0.6}px))`;
+                imgLayer.style.transform = `translateX(calc(-50% + ${imgTranslateX}px)) translateY(${currentY * 20}px)`;
             }
             
             requestAnimationFrame(renderParallax);
