@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Hero Banner - 1920px Constrained Layout</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,12 +32,12 @@
             box-sizing: border-box;
         }
 
-        body {
+        html, body {
             background-color: var(--bg-main);
             min-height: 100vh;
-            width: 100%; /* ИСПРАВЛЕНИЕ: Заменено со 100vw для предотвращения потенциального горизонтального скролла */
+            width: 100%;
             position: relative;
-            overflow: hidden;
+            overflow-x: hidden; /* СТРОГОЕ ИСПРАВЛЕНИЕ: запрещаем любой горизонтальный скролл на корневом уровне */
             font-family: var(--font-unbounded);
         }
 
@@ -86,7 +86,7 @@
             bottom: 0;               
             left: 50%;
             transform: translateX(-40%); 
-            width: 70vh; /* ИСПРАВЛЕНИЕ: Добавлен базовый размер во избежание CLS (Layout Shift) до загрузки картинки */
+            width: 70vh; 
             height: 100vh;           
             z-index: 3;             
             pointer-events: none; 
@@ -122,7 +122,6 @@
             position: absolute;
             top: 0;
             left: 0;
-            
             -webkit-mask-image: radial-gradient(
                 circle calc(var(--mask-size) + var(--mask-blur)) at var(--mouse-x) var(--mouse-y), 
                 black calc(var(--mask-size) - var(--mask-blur)), 
@@ -204,7 +203,6 @@
             transform: translate(2px, -2px);
         }
 
-        /* Кнопка бургера на главной */
         .burger-btn {
             background: rgba(22, 27, 36, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.3);
@@ -474,7 +472,6 @@
             transform: scale(1.05);
         }
 
-        /* Модальное окно записи */
         .modal-sheet {
             position: absolute;
             top: 50%;
@@ -570,7 +567,6 @@
             margin-top: 12px;
         }
 
-        /* Полноэкранное меню */
         .menu-content-wrapper {
             width: 100%;
             height: 100%;
@@ -651,7 +647,7 @@
         }
 
         /* ==========================================================================
-           АДАПТИВНОСТЬ
+           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ГЛУБОКАЯ ПЕРЕРАБОТКА)
            ========================================================================== */
         @media (max-width: 1400px) {
             .bg-watermark { font-size: 320px; letter-spacing: -15px; }
@@ -663,46 +659,91 @@
         }
 
         @media (max-width: 768px) {
-            body { overflow-y: auto; }
-            .page-wrapper { padding: 24px 16px 120px 16px; height: auto; min-height: 100vh; justify-content: flex-start; gap: 40px; }
-            .mentor-card { display: none !important; }
-            .video-link { display: none !important; }
-            .header .btn-cta { display: none !important; }
+            html, body { 
+                overflow-y: auto; 
+                overflow-x: hidden; 
+                height: 100vh;
+            }
+            
+            /* Сборка обертки контента снизу вверх */
+            .page-wrapper { 
+                padding: 24px 16px 140px 16px; /* Большой отступ снизу под таббар кнопки */
+                height: 100vh; 
+                justify-content: flex-start; 
+                gap: 0;
+            }
 
-            .bg-watermark { font-size: 140px; letter-spacing: -5px; top: 40%; }
+            /* ИСПРАВЛЕНИЕ: Прячем лишний вылетающий водяной знак во избежание скролла */
+            .bg-watermark { 
+                font-size: 120px; 
+                letter-spacing: -4px; 
+                top: 30%; 
+                max-width: 100%;
+                overflow: hidden;
+            }
 
+            /* ИСПРАВЛЕНИЕ: me.png теперь яркий, маски полностью деактивированы */
             .character-container {
-                height: 70vh;
+                height: 55vh;
                 width: auto;
                 transform: translateX(-50%) !important;
                 left: 50% !important;
-                opacity: 0.85; 
-                filter: none; 
+                opacity: 1; 
+                filter: none;
+                bottom: 120px; /* Приподнимаем над блоком текста */
             }
 
-            .character-img.base-layer { -webkit-mask-image: none !important; mask-image: none !important; }
+            .character-img.base-layer { 
+                -webkit-mask-image: none !important; 
+                mask-image: none !important; 
+            }
             .character-img.hover-layer { display: none !important; }
 
-            .main-content { margin-top: 20px; margin-bottom: 0; }
-            .main-heading { font-size: 34px; letter-spacing: -1px; margin-bottom: 24px; }
-            .label-top { font-size: 18px; }
-            .feature-badge { font-size: 12px; padding: 10px 18px; }
-            .footer-text { margin-top: auto; font-size: 9px; }
+            /* ИСПРАВЛЕНИЕ: УТП и Главный заголовок жестко прибиты к самому низу, прямо к кнопке */
+            .main-content { 
+                margin-top: auto; 
+                margin-bottom: 0; 
+                width: 100%;
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-end;
+            }
+            
+            .main-heading { 
+                font-size: 32px; 
+                letter-spacing: -1px; 
+                margin-bottom: 20px; 
+                line-height: 1.2;
+            }
+            
+            .label-top { font-size: 16px; }
+            .feature-badge { font-size: 12px; padding: 10px 16px; }
+            
+            .mentor-card, .video-link, .header .btn-cta { display: none !important; }
+            .footer-text { display: none !important; } /* Скрываем громоздкую сноску, чтоб освободить экран телефона */
 
+            /* ИСПРАВЛЕНИЕ: Серая заливка под цвет фона вместо темного градиента */
             .mobile-fixed-btn-wrapper {
                 display: block;
                 position: fixed;
                 bottom: 0;
                 left: 0;
                 width: 100%;
-                background: linear-gradient(to top, rgba(22, 27, 36, 0.95) 70%, rgba(22, 27, 36, 0));
-                padding: 24px 16px;
+                background: linear-gradient(to top, rgba(166, 172, 181, 1) 75%, rgba(166, 172, 181, 0) 100%);
+                padding: 24px 16px 32px 16px; /* Увеличен нижний внутренний отступ для безрамочных девайсов (Safe Area) */
                 z-index: 999;
                 pointer-events: auto;
             }
 
-            .mobile-fixed-btn-wrapper .btn-cta { width: 100%; height: 56px; border-radius: 8px; font-size: 15px; }
+            .mobile-fixed-btn-wrapper .btn-cta { 
+                width: 100%; 
+                height: 54px; 
+                border-radius: 8px; 
+                font-size: 15px; 
+                box-shadow: 0 4px 15px rgba(22, 27, 36, 0.15);
+            }
 
+            /* Модалка на весь экран снизу вверх */
             .overlay-modal {
                 display: flex;
                 align-items: flex-end;
@@ -957,21 +998,16 @@
             }
         });
 
-        /* ==========================================================================
-           ИСПРАВЛЕНИЕ: ДИНАМИЧЕСКИЙ РЕСАЙЗ ЧЕРЕЗ window.matchMedia (ПРОИЗВОДИТЕЛЬНОСТЬ)
-           ========================================================================== */
         const mediaQuery = window.matchMedia('(min-width: 769px)');
 
         function handleBreakpointChange(e) {
             isDesktop = e.matches;
             
             if (isDesktop) {
-                // Если переключились на десктоп — возвращаем маски и сбрасываем left
                 imgLayer.style.left = '';
                 imgLayer.style.setProperty('--mask-size', '430px');
                 imgLayer.style.setProperty('--mask-blur', '110px');
             } else {
-                // Если ушли на мобилку — полностью очищаем инлайновые стили параллакса
                 bgLayer.style.transform = '';
                 textLayer.style.transform = '';
                 cardLayer.style.transform = '';
@@ -980,11 +1016,9 @@
             }
         }
 
-        // Подписываемся на изменения и делаем первичный запуск
         mediaQuery.addEventListener('change', handleBreakpointChange);
         handleBreakpointChange(mediaQuery);
 
-        // Слушатель мыши собирает координаты только на десктопах
         document.addEventListener('mousemove', (e) => {
             if (!isDesktop) return;
 
@@ -993,7 +1027,6 @@
             targetX = (e.clientX / window.innerWidth) - 0.5;
         });
 
-        // Функция плавной анимации (LERP) через RequestAnimationFrame
         function renderParallax() {
             if (isDesktop) {
                 currentX += (targetX - currentX) * 0.08; 
@@ -1011,13 +1044,11 @@
                 const maxRotateY = 0.2; 
                 const rotateY = -currentX * maxRotateY; 
 
-                // Рендерим слои параллакса
                 bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX}px), -50%)`;
                 textLayer.style.transform = `translate(calc(-50% + ${textTranslateX}px), -50%)`;
                 cardLayer.style.transform = `translate(${cardTranslateX}px, -50%)`;
                 imgLayer.style.transform = `translateX(calc(-40% + ${imgTranslateX}px)) perspective(1000px) rotateX(0deg) rotateY(${rotateY}deg)`;
 
-                // Вычисление положения фонарика внутри контейнера
                 const rect = imgLayer.getBoundingClientRect();
                 const mouseXInContainer = mouseX - rect.left;
                 const mouseYInContainer = mouseY - rect.top;
@@ -1029,7 +1060,6 @@
             requestAnimationFrame(renderParallax);
         }
 
-        // Запуск бесконечного цикла рендера
         requestAnimationFrame(renderParallax);
     </script>
 </body>
