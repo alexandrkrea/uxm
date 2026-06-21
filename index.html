@@ -34,10 +34,10 @@
 
         html, body {
             background-color: var(--bg-main);
-            min-height: 100vh;
+            height: 100vh;
             width: 100%;
             position: relative;
-            overflow-x: hidden; /* СТРОГОЕ ИСПРАВЛЕНИЕ: запрещаем любой горизонтальный скролл на корневом уровне */
+            overflow: hidden; /* Нам больше не нужен скролл, всё помещается в один экран */
             font-family: var(--font-unbounded);
         }
 
@@ -49,8 +49,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 110vw; 
-            height: 110vh;
+            width: 120vw; 
+            height: 120vh;
             transform: translate(-50%, -50%);
             background-image: url('bg.svg');
             background-position: center;
@@ -302,6 +302,10 @@
             pointer-events: auto;
         }
 
+        .main-content .btn-cta {
+            display: none; /* Скрыта на десктопе, так как кнопка в хедере */
+        }
+
         .label-container {
             display: flex;
             align-items: center;
@@ -419,10 +423,6 @@
             line-height: 1.5;
             z-index: 10;
             pointer-events: auto;
-        }
-
-        .mobile-fixed-btn-wrapper {
-            display: none;
         }
 
         /* ==========================================================================
@@ -647,7 +647,7 @@
         }
 
         /* ==========================================================================
-           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ГЛУБОКАЯ ПЕРЕРАБОТКА)
+           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ПОЛНОЭКРАННЫЙ ЖЕСТКИЙ МОНОЛИТ)
            ========================================================================== */
         @media (max-width: 1400px) {
             .bg-watermark { font-size: 320px; letter-spacing: -15px; }
@@ -660,37 +660,41 @@
 
         @media (max-width: 768px) {
             html, body { 
-                overflow-y: auto; 
-                overflow-x: hidden; 
+                overflow: hidden !important; 
                 height: 100vh;
             }
             
-            /* Сборка обертки контента снизу вверх */
             .page-wrapper { 
-                padding: 24px 16px 140px 16px; /* Большой отступ снизу под таббар кнопки */
+                padding: 24px 16px 24px 16px; 
                 height: 100vh; 
-                justify-content: flex-start; 
+                justify-content: space-between; 
                 gap: 0;
             }
 
-            /* ИСПРАВЛЕНИЕ: Прячем лишний вылетающий водяной знак во избежание скролла */
             .bg-watermark { 
-                font-size: 120px; 
+                font-size: 130px; 
                 letter-spacing: -4px; 
-                top: 30%; 
-                max-width: 100%;
-                overflow: hidden;
+                top: 35%; 
+                width: 100%;
+                text-align: center;
             }
 
-            /* ИСПРАВЛЕНИЕ: me.png теперь яркий, маски полностью деактивированы */
+            /* ИСПРАВЛЕНИЕ: me.png теперь на весь экран по высоте (100vh) и имеет честный сочный цвет */
             .character-container {
-                height: 55vh;
-                width: auto;
+                height: 100vh;
+                width: 100%;
                 transform: translateX(-50%) !important;
                 left: 50% !important;
                 opacity: 1; 
                 filter: none;
-                bottom: 120px; /* Приподнимаем над блоком текста */
+                bottom: 0;
+            }
+
+            .character-img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover; /* Заполняет высоту, аккуратно обрезая края */
+                object-position: center bottom; /* Привязка фокуса к низу */
             }
 
             .character-img.base-layer { 
@@ -699,51 +703,46 @@
             }
             .character-img.hover-layer { display: none !important; }
 
-            /* ИСПРАВЛЕНИЕ: УТП и Главный заголовок жестко прибиты к самому низу, прямо к кнопке */
+            /* ИСПРАВЛЕНИЕ: Контент прибит к низу, кнопка упакована внутрь блока, серый градиент */
             .main-content { 
                 margin-top: auto; 
                 margin-bottom: 0; 
-                width: 100%;
+                width: calc(100% + 32px); /* Растягиваем на всю ширину экрана с учетом паддингов */
+                margin-left: -16px;
+                margin-right: -16px;
+                padding: 40px 16px 24px 16px;
                 display: flex;
                 flex-direction: column;
                 justify-content: flex-end;
+                /* Серый градиент начинается прямо от лейбла "Полный курс" */
+                background: linear-gradient(to top, rgba(166, 172, 181, 1) 0%, rgba(166, 172, 181, 0.95) 60%, rgba(166, 172, 181, 0) 100%);
             }
             
             .main-heading { 
                 font-size: 32px; 
                 letter-spacing: -1px; 
-                margin-bottom: 20px; 
-                line-height: 1.2;
+                margin-bottom: 16px; 
+                line-height: 1.15;
+                color: #ffffff;
             }
             
             .label-top { font-size: 16px; }
-            .feature-badge { font-size: 12px; padding: 10px 16px; }
+            .features-grid { margin-bottom: 24px; } /* Делаем зазор перед кнопкой */
+            .feature-badge { font-size: 11px; padding: 10px 14px; background-color: rgba(22, 27, 36, 0.9); }
             
-            .mentor-card, .video-link, .header .btn-cta { display: none !important; }
-            .footer-text { display: none !important; } /* Скрываем громоздкую сноску, чтоб освободить экран телефона */
-
-            /* ИСПРАВЛЕНИЕ: Серая заливка под цвет фона вместо темного градиента */
-            .mobile-fixed-btn-wrapper {
-                display: block;
-                position: fixed;
-                bottom: 0;
-                left: 0;
+            /* Включаем кнопку внутри контента на мобилке */
+            .main-content .btn-cta {
+                display: flex;
                 width: 100%;
-                background: linear-gradient(to top, rgba(166, 172, 181, 1) 75%, rgba(166, 172, 181, 0) 100%);
-                padding: 24px 16px 32px 16px; /* Увеличен нижний внутренний отступ для безрамочных девайсов (Safe Area) */
-                z-index: 999;
-                pointer-events: auto;
+                height: 56px;
+                font-size: 15px;
+                box-shadow: 0 4px 20px rgba(22, 27, 36, 0.2);
             }
 
-            .mobile-fixed-btn-wrapper .btn-cta { 
-                width: 100%; 
-                height: 54px; 
-                border-radius: 8px; 
-                font-size: 15px; 
-                box-shadow: 0 4px 15px rgba(22, 27, 36, 0.15);
-            }
+            .mentor-card, .video-link, .header .btn-cta { display: none !important; }
+            .footer-text { display: none !important; } 
 
-            /* Модалка на весь экран снизу вверх */
+            /* Модалка bottom sheet */
             .overlay-modal {
                 display: flex;
                 align-items: flex-end;
@@ -892,6 +891,14 @@
                 <span class="feature-badge">Много практики</span>
                 <span class="feature-badge">Видеоразборы</span>
             </div>
+
+            <button class="btn-cta trigger-modal">
+                Записаться
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <line x1="17" y1="7" x2="7" y2="17"></line>
+                    <polyline points="17 17 7 17 7 7"></polyline>
+                </svg>
+            </button>
         </main>
 
         <a href="#" class="video-link">
@@ -907,16 +914,6 @@
             * Консультирование по дисциплине «Веб-дизайн и компьютерная графика» БГУ ФСК с 1 по 3 курс и обучение работе на фрилансе.
         </footer>
 
-    </div>
-
-    <div class="mobile-fixed-btn-wrapper">
-        <button class="btn-cta trigger-modal">
-            Записаться
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <line x1="17" y1="7" x2="7" y2="17"></line>
-                <polyline points="17 17 7 17 7 7"></polyline>
-            </svg>
-        </button>
     </div>
 
     <script>
@@ -1019,6 +1016,11 @@
         mediaQuery.addEventListener('change', handleBreakpointChange);
         handleBreakpointChange(mediaQuery);
 
+        /* ==========================================================================
+           ИСПРАВЛЕНИЕ: ДЕЛИКАТНЫЙ ПАРАЛЛАКС ДЛЯ ДЕСКТОПА (МЫШЬ) И МОБИЛКИ (ГИРОСКОП)
+           ========================================================================== */
+        
+        // Слушатель мыши (Десктоп)
         document.addEventListener('mousemove', (e) => {
             if (!isDesktop) return;
 
@@ -1027,20 +1029,38 @@
             targetX = (e.clientX / window.innerWidth) - 0.5;
         });
 
+        // Слушатель гироскопа (Мобилка)
+        window.addEventListener('deviceorientation', (e) => {
+            if (isDesktop) return;
+            
+            // gamma — это наклон устройства влево/вправо в градусах (от -90 до 90)
+            let gamma = e.gamma; 
+            if (gamma === null) return;
+
+            // Ограничиваем рабочий угол наклона в пределах разумных +-25 градусов для отзывчивости
+            if (gamma > 25) gamma = 25;
+            if (gamma < -25) gamma = -25;
+
+            // Переводим градусы в диапазон от -0.5 до 0.5 для формулы LERP параллакса
+            targetX = gamma / 50; 
+        });
+
+        // Цикл плавной отрисовки кадра (RAF) работает одинаково хорошо для мыши и гироскопа
         function renderParallax() {
+            // Формула сглаживания LERP
+            currentX += (targetX - currentX) * 0.08; 
+
+            const bgSpeed = -35;   
+            const textSpeed = -55; 
+            const imgSpeed = 35;   
+            const cardSpeed = 60; 
+
+            const bgTranslateX = currentX * bgSpeed;
+            const textTranslateX = currentX * textSpeed;
+            const imgTranslateX = currentX * imgSpeed;
+            const cardTranslateX = currentX * cardSpeed;
+
             if (isDesktop) {
-                currentX += (targetX - currentX) * 0.08; 
-
-                const bgSpeed = -35;   
-                const textSpeed = -55; 
-                const imgSpeed = 35;   
-                const cardSpeed = 60; 
-
-                const bgTranslateX = currentX * bgSpeed;
-                const textTranslateX = currentX * textSpeed;
-                const imgTranslateX = currentX * imgSpeed;
-                const cardTranslateX = currentX * cardSpeed;
-
                 const maxRotateY = 0.2; 
                 const rotateY = -currentX * maxRotateY; 
 
@@ -1055,6 +1075,11 @@
 
                 imgLayer.style.setProperty('--mouse-x', `${mouseXInContainer}px`);
                 imgLayer.style.setProperty('--mouse-y', `${mouseYInContainer}px`);
+            } else {
+                // На мобилке смещаем только фон, водяной знак и картинку, убирая тяжелый поворот по оси Y
+                bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX}px), -50%)`;
+                textLayer.style.transform = `translate(calc(-50% + ${textTranslateX}px), -50%)`;
+                imgLayer.style.transform = `translate(calc(-50% + ${imgTranslateX * 0.5}px), 0)`; // Чуть уменьшаем смещение силуэта для баланса
             }
             
             requestAnimationFrame(renderParallax);
