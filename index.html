@@ -48,8 +48,8 @@
             position: absolute;
             top: 50%;
             left: 50%;
-            width: 130vw; 
-            height: 130vh;
+            width: 110vw; 
+            height: 110vh;
             transform: translate(-50%, -50%);
             background-image: url('bg.svg');
             background-position: center;
@@ -57,8 +57,6 @@
             background-size: cover;
             z-index: 0; 
             pointer-events: none;
-            will-change: transform;
-            transition: transform 0.1s ease-out;
         }
 
         .bg-watermark {
@@ -73,8 +71,6 @@
             white-space: nowrap;
             z-index: 1; 
             pointer-events: none;
-            will-change: transform;
-            transition: transform 0.1s ease-out;
         }
 
         .bg-watermark .gray-letter { color: var(--text-gray); }
@@ -103,14 +99,11 @@
             display: block;
         }
 
-        /* ИСПРАВЛЕНИЕ: Центральная область (ядро) увеличена в 2 раза (с 80px до 160px).
-           Общий радиус маски увеличен до 360px для сохранения красивого мягкого блёра по краям. 
-        */
         .character-img.base-layer {
             position: relative;
             z-index: 1;
-            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 360px);
-            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 360px);
+            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 160px, black 360px);
+            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 160px, black 360px);
         }
 
         .character-img.hover-layer {
@@ -118,8 +111,8 @@
             top: 0;
             left: 0;
             z-index: 2;
-            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 360px);
-            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 360px);
+            -webkit-mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 160px, transparent 360px);
+            mask-image: radial-gradient(circle 360px at var(--mouse-x) var(--mouse-y), black 0%, black 160px, transparent 360px);
         }
 
         .page-wrapper {
@@ -477,30 +470,41 @@
         .menu-social-link:hover { color: var(--accent-lime); }
 
         /* ==========================================================================
-           МОБИЛЬНАЯ АДАПТИВНОСТЬ
+           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ФИНАЛЬНЫЙ ТЮНИНГ)
            ========================================================================== */
         @media (max-width: 768px) {
             html, body { overflow: hidden !important; height: 100vh !important; height: 100lvh !important; }
             .page-wrapper { padding: 20px 16px 20px 16px; height: 100vh; height: 100lvh; justify-content: space-between; gap: 0; }
             .bg-watermark { font-size: 130px; letter-spacing: -4px; top: 35%; width: 100%; text-align: center; }
 
+            /* Контейнер me.png под экстремальное 3D */
             .character-container {
                 height: 100vh; height: 100lvh; width: 100%; transform: translateX(-50%) !important; left: 50% !important;
-                opacity: 1; filter: none; bottom: 0; perspective: 800px; transform-style: preserve-3d;
+                opacity: 1; filter: none; bottom: 0; 
+                perspective: 1000px; 
+                transform-style: preserve-3d;
             }
 
-            .character-img { width: 100%; height: 100%; object-fit: cover; object-position: center bottom; will-change: transform; transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+            .character-img { 
+                width: 100%; height: 100%; object-fit: cover; object-position: center bottom; 
+                will-change: transform; 
+                transition: transform 0.2s cubic-bezier(0.165, 0.84, 0.44, 1); 
+            }
             
             .character-img.base-layer { -webkit-mask-image: none !important; mask-image: none !important; }
             .character-img.hover-layer { display: none !important; }
 
+            /* Главный контент с увеличенной охранной зоной снизу против меню браузера */
             .main-content { 
                 margin-top: auto; margin-bottom: 0; width: calc(100% + 32px); margin-left: -16px; margin-right: -16px;
-                padding: 50px 16px 34px 16px; display: flex; flex-direction: column; justify-content: flex-end;
+                /* ИСПРАВЛЕНИЕ: Выставили нижний отступ 70px. Теперь кнопка гарантированно приподнята над нативными плашками */
+                padding: 50px 16px 70px 16px; 
+                display: flex; flex-direction: column; justify-content: flex-end;
                 background: linear-gradient(to top, rgba(166, 172, 181, 1) 0%, rgba(166, 172, 181, 0.98) 75%, rgba(166, 172, 181, 0) 100%);
             }
             
-            .main-heading { font-size: 32px; letter-spacing: -1px; margin-bottom: 16px; line-height: 1.15; color: #ffffff; }
+            /* ИСПРАВЛЕНИЕ: Увеличен размер заголовка до 38px для дерзкого контраста */
+            .main-heading { font-size: 38px; letter-spacing: -1.5px; margin-bottom: 18px; line-height: 1.15; color: #ffffff; }
             .label-top { font-size: 16px; }
             .features-grid { margin-bottom: 24px; } 
             .feature-badge { font-size: 11px; padding: 10px 14px; background-color: rgba(22, 27, 36, 0.9); }
@@ -627,7 +631,8 @@
             </div>
             
             <h1 class="main-heading">
-                Курс&nbsp;веб-дизайна
+                Курс
+                <br>веб-дизайна
                 <br>
                 c&nbsp;ментором
             </h1>
@@ -704,9 +709,7 @@
         /* ОТКРЫТИЕ МЕНЮ */
         burgerBtn.addEventListener('click', () => {
             fullscreenMenu.style.display = 'block';
-            setTimeout(() => {
-                fullscreenMenu.classList.add('active');
-            }, 10);
+            setTimeout(() => { fullscreenMenu.classList.add('active'); }, 10);
             burgerBtn.classList.add('hidden-state'); 
             document.body.classList.add('modal-open');
             closeFormModal();
@@ -715,35 +718,19 @@
         /* ЗАКРЫТИЕ МЕНЮ */
         function closeMainMenu() {
             fullscreenMenu.classList.remove('active');
-            setTimeout(() => {
-                if (!fullscreenMenu.classList.contains('active')) {
-                    fullscreenMenu.style.display = 'none';
-                }
-            }, 400);
+            setTimeout(() => { if (!fullscreenMenu.classList.contains('active')) fullscreenMenu.style.display = 'none'; }, 400);
             burgerBtn.classList.remove('hidden-state'); 
-            if (!bookingModal.classList.contains('active')) {
-                document.body.classList.remove('modal-open');
-            }
+            if (!bookingModal.classList.contains('active')) document.body.classList.remove('modal-open');
         }
 
-        menuCloseBtn.addEventListener('click', (e) => {
-            e.stopPropagation(); 
-            closeMainMenu();
-        });
-
-        fullscreenMenu.addEventListener('click', (e) => {
-            if (!menuNav.contains(e.target) && !menuFooter.contains(e.target) && e.target !== menuCloseBtn) {
-                closeMainMenu();
-            }
-        });
+        menuCloseBtn.addEventListener('click', (e) => { e.stopPropagation(); closeMainMenu(); });
+        fullscreenMenu.addEventListener('click', (e) => { if (!menuNav.contains(e.target) && !menuFooter.contains(e.target) && e.target !== menuCloseBtn) closeMainMenu(); });
 
         /* ЛОГИКА ОКНА ЗАПИСИ */
         triggerButtons.forEach(btn => {
             btn.addEventListener('click', () => {
                 bookingModal.style.display = isDesktop ? 'block' : 'flex';
-                setTimeout(() => {
-                    bookingModal.classList.add('active');
-                }, 10);
+                setTimeout(() => { bookingModal.classList.add('active'); }, 10);
                 document.body.classList.add('modal-open');
                 fullscreenMenu.classList.remove('active');
                 fullscreenMenu.style.display = 'none';
@@ -753,37 +740,22 @@
 
         function closeFormModal() {
             bookingModal.classList.remove('active');
-            setTimeout(() => {
-                if (!bookingModal.classList.contains('active')) {
-                    bookingModal.style.display = 'none';
-                }
-            }, 400);
-            if(!fullscreenMenu.classList.contains('active')) {
-                document.body.classList.remove('modal-open');
-            }
+            setTimeout(() => { if (!bookingModal.classList.contains('active')) bookingModal.style.display = 'none'; }, 400);
+            if(!fullscreenMenu.classList.contains('active')) document.body.classList.remove('modal-open');
         }
 
         closeModalBtn.addEventListener('click', closeFormModal);
-
-        bookingModal.addEventListener('click', (e) => {
-            if (e.target === bookingModal) closeFormModal();
-        });
-
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeFormModal();
-                closeMainMenu();
-            }
-        });
+        bookingModal.addEventListener('click', (e) => { if (e.target === bookingModal) closeFormModal(); });
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { closeFormModal(); closeMainMenu(); } });
 
         const mediaQuery = window.matchMedia('(min-width: 769px)');
 
         function handleBreakpointChange(e) {
             isDesktop = e.matches;
-            
             if (isDesktop) {
                 imgLayer.style.left = '';
             } else {
+                // Сброс статических трансформаций для мобилки
                 bgLayer.style.transform = '';
                 textLayer.style.transform = '';
                 cardLayer.style.transform = '';
@@ -837,9 +809,10 @@
             currentX += (targetX - currentX) * 0.08; 
             currentY += (targetY - currentY) * 0.08; 
 
+            // ИСПРАВЛЕНИЕ: Вынесли все коэффициенты 3D-движения исключительно на силуэт ментора для мобилки
             const bgSpeed = -35;   
             const textSpeed = -55; 
-            const imgSpeed = 40;   
+            const imgSpeed = 45;   
             const cardSpeed = 60; 
 
             const bgTranslateX = currentX * bgSpeed;
@@ -856,13 +829,12 @@
                 cardLayer.style.transform = `translate(${cardTranslateX}px, -50%)`;
                 imgLayer.style.transform = `translateX(calc(-40% + ${imgTranslateX}px)) perspective(1000px) rotateX(0deg) rotateY(${rotateY}deg)`;
             } else {
-                const rotateY = currentX * 18; 
-                const rotateX = -currentY * 12; 
+                // ИСПРАВЛЕНИЕ: 3D эффект кренится и разворачивается СТРОГО на me.png (imgLayer), 
+                // задний фон и фейковый текст водяного знака остаются зафиксированными монолитно
+                const rotateY = currentX * 22; 
+                const rotateX = -currentY * 15; 
                 
-                bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX}px), calc(-50% + ${currentY * bgSpeed}px))`;
-                textLayer.style.transform = `translate(calc(-50% + ${textTranslateX}px), calc(-50% + ${currentY * textSpeed}px))`;
-                
-                imgLayer.style.transform = `translateX(calc(-50% + ${imgTranslateX}px)) translateY(${currentY * 15}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+                imgLayer.style.transform = `translateX(calc(-50% + ${imgTranslateX}px)) translateY(${currentY * 18}px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
             }
             
             requestAnimationFrame(renderParallax);
