@@ -773,7 +773,7 @@ body.modal-open {
     .cards-track { padding: 0 16px; }
     .course-card { flex: 0 0 310px; height: 400px; padding: 28px; }
     .card-title { font-size: 24px; }
-    .scroll-indicator-bar { width: calc(100% - 32px); left: 16px; bottom: 40px; }
+    .scroll-indicator-bar { width: calc(100% - 32px); left: 16px; }
 }
 
 @keyframes rotate-star { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
