@@ -99,8 +99,8 @@ body.modal-open {
 .character-img.base-layer {
     position: relative;
     z-index: 1;
-    -webkit-mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 680px);
-    mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 260px, black 680px);
+    -webkit-mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 360px, black 680px);
+    mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), transparent 0%, transparent 360px, black 680px);
 }
 
 .character-img.hover-layer {
@@ -108,8 +108,8 @@ body.modal-open {
     top: 0;
     left: 0;
     z-index: 2;
-    -webkit-mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 680px);
-    mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), black 0%, black 260px, transparent 680px);
+    -webkit-mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), black 0%, black 360px, transparent 680px);
+    mask-image: radial-gradient(circle 480px at var(--mouse-x) var(--mouse-y), black 0%, black 360px, transparent 680px);
 }
 
 .page-wrapper {
