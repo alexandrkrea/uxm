@@ -99,7 +99,6 @@
             display: block;
         }
 
-        /* ИСПРАВЛЕНИЕ: Область 100% эффекта увеличена до 260px, общий радиус до 480px */
         .character-img.base-layer {
             position: relative;
             z-index: 1;
@@ -373,7 +372,7 @@
 
         .footer-text {
             font-family: var(--font-mulish); 
-            font-size: 10px;                 
+            font-size: 12px;                 
             font-weight: 400; 
             color: rgba(255, 255, 255, 0.7);
             max-width: 900px;
@@ -401,6 +400,7 @@
         .overlay-modal.active { display: flex; opacity: 1; pointer-events: auto; }
         .fullscreen-menu.active { display: block; opacity: 1; pointer-events: auto; }
 
+        /* ИСПРАВЛЕНИЕ 3: Кнопка закрытия меню позиционируется абсолютно внутри контейнера .page-wrapper, дублируя координаты бургера */
         .menu-close-btn {
             position: absolute;
             top: 64px;
@@ -416,6 +416,7 @@
             cursor: pointer;
             color: #ffffff;
             transition: all 0.3s ease;
+            z-index: 1010;
         }
 
         .menu-close-btn:hover { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.6); transform: scale(1.05); }
@@ -434,10 +435,41 @@
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .overlay-modal.active .modal-sheet { transform: translate(-50%, -50%) scale(1); }
-        .modal-close-btn { position: absolute; top: 24px; right: 24px; background: rgba(255,255,255,0.05); border: none; width: 36px; height: 36px; border-radius: 50%; color: #ffffff; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.2s; }
-        .modal-close-btn:hover { background: rgba(255,255,255,0.15); }
-        .modal-title { font-size: 28px; font-weight: 500; color: #ffffff; text-transform: uppercase; margin-bottom: 12px; letter-spacing: -0.5px; }
+        /* ИСПРАВЛЕНИЕ 6: Шапка модального окна в виде флексбокса для удержания на одной строке */
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .modal-title { 
+            font-size: 28px; 
+            font-weight: 500; 
+            color: #ffffff; 
+            text-transform: uppercase; 
+            letter-spacing: -0.5px; 
+            flex-grow: 1;
+        }
+
+        /* ИСПРАВЛЕНИЕ 6: Крестик модалки стилизован точно так же, как в бургер-меню */
+        .modal-close-btn { 
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 54px; 
+            height: 54px; 
+            border-radius: 8px; 
+            color: #ffffff; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .modal-close-btn:hover { background: rgba(255, 255, 255, 0.15); border-color: rgba(255, 255, 255, 0.3); }
+
         .modal-subtitle { font-family: var(--font-mulish); font-size: 16px; color: var(--text-gray); margin-bottom: 32px; line-height: 1.4; }
         .form-group { margin-bottom: 20px; }
         .form-label { display: block; font-family: var(--font-mulish); font-size: 12px; font-weight: 600; color: var(--accent-lime); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
@@ -449,7 +481,7 @@
         .form-input:focus { outline: none; border-color: var(--accent-lime); background-color: rgba(255, 255, 255, 0.08); }
         .modal-sheet .btn-submit { width: 100%; margin-top: 12px; }
 
-        .menu-content-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 80px; max-width: 1920px; margin: 0 auto; }
+        .menu-content-wrapper { width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; padding: 80px; max-width: 1920px; margin: 0 auto; position: relative; }
         .menu-nav { display: flex; flex-direction: column; gap: 24px; width: fit-content; }
         
         .menu-link {
@@ -470,18 +502,30 @@
         .menu-social-link { font-family: var(--font-mulish); font-size: 16px; font-weight: 600; color: var(--text-gray); text-decoration: none; transition: color 0.2s; }
         .menu-social-link:hover { color: var(--accent-lime); }
 
+        /* ИСПРАВЛЕНИЕ 4: Промежуточный брейкпоинт для ранней перестройки УТП-плашек во избежание наезда ссылки видео */
+        @media (max-width: 1340px) {
+            .main-content {
+                max-width: 650px;
+            }
+            .features-grid {
+                max-width: 480px;
+                flex-direction: row;
+            }
+        }
+
         /* ==========================================================================
-           МОБИЛЬНАЯ АДАПТИВНОСТЬ (ИСПРАВЛЕНИЯ IOS И ТАББАРА)
+           МОБИЛЬНАЯ АДАПТИВНОСТЬ
            ========================================================================== */
         @media (max-width: 768px) {
             html, body { overflow: hidden !important; height: 100vh !important; height: 100lvh !important; }
-            .page-wrapper { padding: 20px 16px 20px 16px; height: 100vh; height: 100lvh; justify-content: space-between; gap: 0; }
-            .bg-watermark { font-size: 130px; letter-spacing: -4px; top: 35%; width: 100%; text-align: center; }
+            .page-wrapper { padding: 20px 16px; height: 100vh; height: 100lvh; justify-content: space-between; gap: 0; }
+            
+            /* ИСПРАВЛЕНИЕ 2: AI/UX/UI увеличен ровно в 2 раза на мобилке (было 130px, стало 260px) */
+            .bg-watermark { font-size: 260px; letter-spacing: -8px; top: 35%; width: 100%; text-align: center; }
 
             .character-container {
                 height: 100vh; height: 100lvh; width: 100%; transform: translateX(-50%) !important; left: 50% !important;
                 opacity: 1; filter: none; bottom: 0; 
-                /* Убран гироскопический наклон, возвращен чистый CSS параллакс */
                 perspective: none; 
                 transform-style: flat;
             }
@@ -495,42 +539,43 @@
             .character-img.base-layer { -webkit-mask-image: none !important; mask-image: none !important; }
             .character-img.hover-layer { display: none !important; }
 
-            /* Главный контент с увеличенной охранной зоной снизу против меню браузера */
             .main-content { 
                 margin-top: auto; margin-bottom: 0; width: calc(100% + 32px); margin-left: -16px; margin-right: -16px;
-                /* ИСПРАВЛЕНИЕ: Отступ увеличен до 100px — теперь кнопка гарантированно выше шторки iPhone 12 Pro */
                 padding: 50px 16px 100px 16px; 
                 display: flex; flex-direction: column; justify-content: flex-end;
-                /* ИСПРАВЛЕНИЕ: Градиент сделан более прозрачным (0.8 вместо 0.98) */
                 background: linear-gradient(to top, rgba(166, 172, 181, 0.8) 0%, rgba(166, 172, 181, 0.7) 75%, rgba(166, 172, 181, 0) 100%);
+                max-width: none;
             }
             
-            /* ИСПРАВЛЕНИЕ: Размер увеличен до 38px */
             .main-heading { font-size: 38px; letter-spacing: -1.5px; margin-bottom: 18px; line-height: 1.15; color: #ffffff; }
             .label-top { font-size: 16px; }
-            .features-grid { margin-bottom: 24px; } 
+            .features-grid { margin-bottom: 24px; max-width: none; } 
             .feature-badge { font-size: 11px; padding: 10px 14px; background-color: rgba(22, 27, 36, 0.9); }
             
             .main-content .btn-cta { display: flex; width: 100%; height: 56px; font-size: 15px; box-shadow: 0 4px 20px rgba(22, 27, 36, 0.2); }
             .mentor-card, .video-link, .header .btn-cta { display: none !important; }
             .footer-text { display: none !important; } 
 
-            /* ИСПРАВЛЕНИЕ: Центрируем модалку по флексу вместо нижнего прижатия, чтобы её не резал браузер */
             .overlay-modal.active { display: flex; align-items: center; justify-content: center; padding: 16px; }
+            
+            /* ИСПРАВЛЕНИЕ 6: Оптимизация отступов для мобильного попапа */
             .modal-sheet {
                 position: relative;
                 top: auto; left: auto; bottom: auto; transform: scale(0.95) !important; 
                 width: 100%; max-width: 440px;
                 border-radius: 16px; 
-                /* ИСПРАВЛЕНИЕ: Добавлены жесткие внутренние отступы, включая безопасную зону снизу */
-                padding: 32px 20px 60px 20px; 
+                padding: 24px 16px 40px 16px; 
                 transition: transform 0.3s ease;
             }
             .overlay-modal.active .modal-sheet { transform: scale(1) !important; }
+            .modal-title { font-size: 22px; }
+            .modal-close-btn { width: 44px; height: 44px; }
             
             .menu-content-wrapper { padding: 40px 24px; }
             .menu-link { font-size: 36px; }
-            .menu-close-btn { right: 16px; top: 24px; }
+            
+            /* ИСПРАВЛЕНИЕ 3: На мобилке крестик меню тоже встает идеально на место бургера */
+            .menu-close-btn { right: 16px; top: 20px; }
         }
 
         @keyframes rotate-star { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
@@ -541,8 +586,9 @@
 
     <div class="parallax-bg" id="parallax-bg"></div>
 
+    <!-- ИСПРАВЛЕНИЕ 1: Последовательность изменена на AI / UX / UI -->
     <div class="bg-watermark" id="parallax-text">
-        <span class="gray-letter">UI</span><span class="lime-slash">/</span><span class="gray-letter">UX</span><span class="lime-slash">/</span><span class="gray-letter">AI</span>
+        <span class="gray-letter">AI</span><span class="lime-slash">/</span><span class="gray-letter">UX</span><span class="lime-slash">/</span><span class="gray-letter">UI</span>
     </div>
     
     <div class="character-container" id="parallax-img">
@@ -551,6 +597,7 @@
     </div>
 
     <div class="fullscreen-menu" id="fullscreen-menu">
+        <!-- ИСПРАВЛЕНИЕ 3: Вынесено из .menu-content-wrapper для соответствия сетке основной страницы -->
         <button class="menu-close-btn" id="menu-close-btn" aria-label="Закрыть меню">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
                 <line x1="18" y1="6" x2="6" y2="18"></line>
@@ -575,13 +622,16 @@
 
     <div class="overlay-modal" id="booking-modal">
         <div class="modal-sheet">
-            <button class="modal-close-btn" id="close-modal-btn" aria-label="Закрыть модальное окно">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
-                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-            </button>
-            <h2 class="modal-title">Запись на курс</h2>
+            <!-- ИСПРАВЛЕНИЕ 6: Добавлена обертка шапки. Кнопка теперь лежит внутри нее на одной строке с заголовком -->
+            <div class="modal-header">
+                <h2 class="modal-title">Запись на курс</h2>
+                <button class="modal-close-btn" id="close-modal-btn" aria-label="Закрыть модальное окно">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
             <p class="modal-subtitle">Оставьте ваши контакты, и ментор свяжется с вами для персональной консультации.</p>
             
             <form id="booking-form" onsubmit="event.preventDefault(); alert('Успешная запись!');">
@@ -631,7 +681,6 @@
 
         <main class="main-content">
             <div class="label-container">
-                <!-- ИСПРАВЛЕНИЕ: Заменено на ПОЛНЫЙ -->
                 <div class="label-top">ПОЛНЫЙ</div>
                 <span class="inline-star" aria-hidden="true">
                     <svg width="28" height="28" viewBox="0 0 24 24" fill="var(--accent-lime)">
@@ -671,8 +720,9 @@
             <span>О ВЕБ-ДИЗАЙНЕ<br>И МЕНТОРЕ</span>
         </a>
 
+        <!-- ИСПРАВЛЕНИЕ 5: Изменен текст дисклеймера, размер шрифта задан равным 12px через CSS класс .footer-text -->
         <footer class="footer-text">
-            * Консультирование по дисциплине «Веб-дизайн и компьютерная графика» БГУ ФСК с 1 по 3 курс и обучение работе на фрилансе.
+            * Консультирование по дисциплине «Веб-дизайн и компьютерная графика» БГУ ФСК с 1 по 3 курс
         </footer>
 
     </div>
@@ -745,7 +795,6 @@
         function handleBreakpointChange(e) {
             isDesktop = e.matches;
             
-            // Сброс трансформаций для чистого пересчета
             bgLayer.style.transform = '';
             textLayer.style.transform = '';
             cardLayer.style.transform = '';
@@ -756,13 +805,12 @@
         mediaQuery.addEventListener('change', handleBreakpointChange);
         handleBreakpointChange(mediaQuery);
 
-        /* СЛУШАТЕЛЬ ДВИЖЕНИЯ (МЫШЬ НА ПК / ТАЧ НА СМАРТФОНЕ) */
+        /* СЛУШАТЕЛЬ ДВИЖЕНИЯ */
         document.addEventListener('mousemove', (e) => {
             if (!isDesktop) return;
             handleMove(e.clientX, e.clientY);
         });
 
-        // На мобилках возвращаем стабильный параллакс от свайпа пальцем
         document.addEventListener('touchmove', (e) => {
             if (isDesktop) return;
             if (e.touches.length > 0) {
@@ -774,7 +822,6 @@
             mouseX = clientX;
             mouseY = clientY;
             
-            // Расчет фонарика для маски на ПК
             if (isDesktop) {
                 const rect = imgLayer.getBoundingClientRect();
                 const mouseXInContainer = clientX - rect.left;
@@ -810,7 +857,6 @@
                 cardLayer.style.transform = `translate(${cardTranslateX}px, -50%)`;
                 imgLayer.style.transform = `translateX(calc(-40% + ${imgTranslateX}px)) perspective(1000px) rotateX(0deg) rotateY(${rotateY}deg)`;
             } else {
-                // Стабильный, отзывчивый параллакс-смещение для всей глубины слоев на мобилке
                 bgLayer.style.transform = `translate(calc(-50% + ${bgTranslateX * 0.4}px), calc(-50% + ${currentY * bgSpeed * 0.4}px))`;
                 textLayer.style.transform = `translate(calc(-50% + ${textTranslateX * 0.6}px), calc(-50% + ${currentY * textSpeed * 0.6}px))`;
                 imgLayer.style.transform = `translateX(calc(-50% + ${imgTranslateX}px)) translateY(${currentY * 20}px)`;
