@@ -734,7 +734,7 @@ body.modal-open {
     .character-img.hover-layer { display: none !important; }
 
     .main-content { 
-        margin-top: auto; margin-bottom: 0; width: calc(100% + 32px); margin-left: -16px; margin-right: -16px;
+        margin-top: auto; margin-bottom: -10px; width: calc(100% + 32px); margin-left: -16px; margin-right: -16px;
         padding: 50px 16px 100px 16px; display: flex; flex-direction: column; justify-content: flex-end;
         background: linear-gradient(to top, rgba(166, 172, 181, 0.8) 0%, rgba(166, 172, 181, 0.7) 75%, rgba(166, 172, 181, 0) 100%);
         max-width: none;
