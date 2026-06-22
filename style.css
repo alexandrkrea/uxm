@@ -693,7 +693,7 @@ body.modal-open {
     color: var(--accent-lime);
     font-family: var(--font-unbounded); 
     font-size: 11px;
-    font-weight: 300;
+    font-weight: 400;
     padding: 6px 20px;
     border-radius: 20px;
     text-transform: uppercase;
